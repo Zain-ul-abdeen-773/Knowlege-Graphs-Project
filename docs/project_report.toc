@@ -1,0 +1,53 @@
+\contentsline {section}{\numberline {1}Introduction to the Domain}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Domain Overview}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Motivation}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Target Application Use Cases}{3}{subsection.1.3}%
+\contentsline {section}{\numberline {2}Dataset Description}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Data Source}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Key Data Fields}{4}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Evidence of Non-RDF Status}{4}{subsection.2.3}%
+\contentsline {section}{\numberline {3}Competency Questions}{4}{section.3}%
+\contentsline {section}{\numberline {4}Conceptual Model}{5}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Conceptual Model Diagram}{5}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}T-Box Schema}{5}{subsection.4.2}%
+\contentsline {section}{\numberline {5}Ontology Design}{5}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Classes (20+ as Required)}{5}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Enumeration Class}{6}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Cardinality Restrictions}{6}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Intersection, Union, and Complement Classes}{6}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Object Properties}{7}{subsection.5.5}%
+\contentsline {subsection}{\numberline {5.6}Data Properties}{8}{subsection.5.6}%
+\contentsline {subsection}{\numberline {5.7}Functional and Inverse Functional Properties}{8}{subsection.5.7}%
+\contentsline {section}{\numberline {6}Graph Generation using Python}{8}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Tools Used}{8}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Pipeline Scripts}{9}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Sample Code: Populating Authors}{9}{subsection.6.3}%
+\contentsline {section}{\numberline {7}External Linking (5-Star Linked Data)}{9}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Linking Strategy}{9}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Linking Implementation}{10}{subsection.7.2}%
+\contentsline {section}{\numberline {8}Reasoning Scenarios}{10}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Reasoning Implementation}{10}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Reasoning Results}{10}{subsection.8.2}%
+\contentsline {section}{\numberline {9}SPARQL Queries}{11}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Query 1: Authors with Multiple Affiliations}{11}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}Query 2: Articles Mentioning Genes}{11}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}Query 3: Author Collaboration Network}{11}{subsection.9.3}%
+\contentsline {subsection}{\numberline {9.4}Query 4: Federated Query to DBpedia}{11}{subsection.9.4}%
+\contentsline {section}{\numberline {10}Web Application (BONUS)}{12}{section.10}%
+\contentsline {subsection}{\numberline {10.1}Application Overview}{12}{subsection.10.1}%
+\contentsline {subsection}{\numberline {10.2}Entity Types Searchable}{12}{subsection.10.2}%
+\contentsline {subsection}{\numberline {10.3}Running the Application}{13}{subsection.10.3}%
+\contentsline {section}{\numberline {11}Results and Statistics}{13}{section.11}%
+\contentsline {subsection}{\numberline {11.1}Generated Data}{13}{subsection.11.1}%
+\contentsline {subsection}{\numberline {11.2}OWL Files Generated}{13}{subsection.11.2}%
+\contentsline {section}{\numberline {12}Visualization}{13}{section.12}%
+\contentsline {subsection}{\numberline {12.1}Tools Used}{13}{subsection.12.1}%
+\contentsline {subsection}{\numberline {12.2}Visualization Guide}{14}{subsection.12.2}%
+\contentsline {section}{\numberline {13}Reflection}{14}{section.13}%
+\contentsline {subsection}{\numberline {13.1}Learning Outcomes}{14}{subsection.13.1}%
+\contentsline {subsection}{\numberline {13.2}Added Value of Linked Data}{14}{subsection.13.2}%
+\contentsline {subsection}{\numberline {13.3}Challenges Faced}{14}{subsection.13.3}%
+\contentsline {section}{\numberline {14}Conclusion}{15}{section.14}%
+\contentsline {section}{\numberline {15}References}{15}{section.15}%
+\contentsline {section}{\numberline {16}Appendix: Project Repository}{15}{section.16}%
+\contentsline {subsection}{\numberline {16.1}Repository Structure}{15}{subsection.16.1}%
