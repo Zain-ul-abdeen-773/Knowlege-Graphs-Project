@@ -1,0 +1,775 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning}
+
+\geometry{margin=1in}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\title{
+    \vspace{-2cm}
+    \textbf{Knowledge Representation and Reasoning} \\
+    \Large Course Project Report \\
+    \vspace{0.5cm}
+    \large PKG2020 Knowledge Graph: \\
+    \large A Linked Data Approach to Bibliometric Research Data
+}
+
+\author{
+    \textbf{Team Members:} \\
+    Zain Ul Abdeen (2023773) \\
+    Omer Khan (2023578) \\
+    Muhammad Umar (2023535) \\
+    \vspace{0.5cm} \\
+    \textbf{Instructor:} Dr. Khurram Jadoon \\
+    \vspace{0.3cm} \\
+    Fall 2025
+}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+%==============================================================================
+\section{Introduction to the Domain}
+%==============================================================================
+
+\subsection{Domain Overview}
+
+The PKG2020S4 (PubMed Knowledge Graph) dataset represents comprehensive bibliometric and researcher metadata from PubMed publications. This domain encompasses:
+
+\begin{itemize}
+    \item \textbf{Research Publications}: Articles identified by PubMed IDs (PMIDs)
+    \item \textbf{Researchers/Authors}: Identified by unique AND\_IDs
+    \item \textbf{Organizational Affiliations}: Universities, research institutions
+    \item \textbf{Career Trajectories}: Employment and education history
+    \item \textbf{Research Funding}: NIH project associations
+    \item \textbf{Bio-Medical Entities}: Genes, diseases, chemicals, mutations mentioned in research
+\end{itemize}
+
+\subsection{Motivation}
+
+The motivation for converting this dataset to linked data includes:
+
+\begin{enumerate}
+    \item \textbf{Semantic Querying}: Enable complex queries across heterogeneous data
+    \item \textbf{Collaboration Discovery}: Find potential research collaborators
+    \item \textbf{Funding Analysis}: Track NIH funding patterns across institutions
+    \item \textbf{Bio-Medical Research}: Link publications to molecular/disease entities
+    \item \textbf{FAIR Principles}: Make data Findable, Accessible, Interoperable, Reusable
+\end{enumerate}
+
+\subsection{Target Application Use Cases}
+
+\begin{enumerate}
+    \item Research collaboration recommendation system
+    \item Funding opportunity matching
+    \item Researcher profiling and expertise identification
+    \item Publication trend analysis
+    \item Bio-entity research landscape mapping
+\end{enumerate}
+
+%==============================================================================
+\section{Dataset Description}
+%==============================================================================
+
+\subsection{Data Source}
+
+The PKG2020S4 dataset is sourced from PubMed bibliometric data and contains the following CSV files:
+
+\begin{table}[H]
+\centering
+\caption{Dataset Files Overview}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{File} & \textbf{Description} & \textbf{Size} \\
+\hline
+OA01\_Author\_List.csv & Author-article relationships & $\sim$10 GB \\
+OA04\_Affiliations.csv & Author affiliations & $\sim$20 GB \\
+OA05\_Researcher\_Employment.csv & Employment history & $\sim$186 MB \\
+OA06\_Researcher\_Education.csv & Education records & $\sim$139 MB \\
+OA02\_Bio\_entities\_Main.csv & Bio-entities in articles & Large \\
+OA03\_Bio\_entities\_Mutation.csv & Mutations in articles & Large \\
+OA07\_NIH\_Projects.csv & NIH funding & $\sim$1.8 GB \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Key Data Fields}
+
+\begin{itemize}
+    \item \textbf{OA01}: PMID, AND\_ID, LastName, ForeName, Initials, AuOrder
+    \item \textbf{OA04}: AND\_ID, Affiliation, City, State, Country
+    \item \textbf{OA05}: AND\_ID, Organization, StartYear, EndYear
+    \item \textbf{OA06}: AND\_ID, Institution, Degree, StartYear, EndYear
+    \item \textbf{OA02/OA03}: PMID, Type, Name, MutationType
+    \item \textbf{OA07}: AND\_ID, ProjectNumber, PI\_Name
+\end{itemize}
+
+\subsection{Evidence of Non-RDF Status}
+
+The dataset is provided as flat CSV files without any semantic annotations, URI schemes, or linked data connections. It has not been published as RDF/OWL prior to this project.
+
+%==============================================================================
+\section{Competency Questions}
+%==============================================================================
+
+The following competency questions guided our ontology design and will be answered through SPARQL queries:
+
+\begin{enumerate}
+    \item Which authors have published in multiple institutions?
+    \item Which articles mention specific bio-entities (genes, diseases)?
+    \item Which authors have collaborated on joint publications?
+    \item Which authors have NIH funding?
+    \item What is the education background of prolific authors?
+    \item What is the employment timeline of researchers?
+    \item Which articles mention both mutations and diseases?
+    \item How many articles does each author have?
+    \item What organizations are most represented in the dataset?
+    \item Which researchers have both employment and education records?
+\end{enumerate}
+
+%==============================================================================
+\section{Conceptual Model}
+%==============================================================================
+
+\subsection{Conceptual Model Diagram}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=1.5cm,
+    class/.style={rectangle, draw, fill=blue!20, text width=2.5cm, text centered, rounded corners, minimum height=1cm},
+    property/.style={->, thick}
+]
+    % Core entities
+    \node[class] (article) {Article\\{\scriptsize hasPMID}};
+    \node[class, right=of article] (author) {Author\\{\scriptsize AND\_ID}};
+    \node[class, below=of article] (authorship) {Authorship\\{\scriptsize authorOrder}};
+    
+    % Organizational
+    \node[class, right=of author] (org) {Organization};
+    \node[class, below=of author] (aff) {Affiliation\\{\scriptsize city, country}};
+    
+    % Career
+    \node[class, below=of org] (emp) {Employment\\{\scriptsize startYear}};
+    \node[class, right=of org] (inst) {Institution};
+    \node[class, below=of inst] (edu) {Education\\{\scriptsize degree}};
+    
+    % Bio
+    \node[class, left=of article] (bio) {BioEntity};
+    \node[class, below=of bio] (nih) {NIHProject};
+    
+    % Relationships
+    \draw[property] (article) -- node[above] {\scriptsize writtenBy} (author);
+    \draw[property] (article) -- node[left] {\scriptsize hasAuthorship} (authorship);
+    \draw[property] (authorship) -- node[below] {\scriptsize refersToAuthor} (author);
+    \draw[property] (author) -- node[above] {\scriptsize hasAffiliation} (aff);
+    \draw[property] (aff) -- node[right] {\scriptsize affiliatedWith} (org);
+    \draw[property] (author) -- node[above] {\scriptsize hasEmployment} (emp);
+    \draw[property] (emp) -- node[above] {\scriptsize employedAt} (org);
+    \draw[property] (author) -- node[above] {\scriptsize hasEducation} (edu);
+    \draw[property] (edu) -- node[above] {\scriptsize educatedAt} (inst);
+    \draw[property] (article) -- node[above] {\scriptsize mentionsBioEntity} (bio);
+    \draw[property] (author) -- node[left] {\scriptsize hasProject} (nih);
+\end{tikzpicture}
+\caption{Conceptual Model of PKG2020 Ontology}
+\end{figure}
+
+\subsection{T-Box Schema}
+
+\begin{table}[H]
+\centering
+\caption{Ontology Classes (T-Box)}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Class} & \textbf{Description} & \textbf{Key Properties} \\
+\hline
+Article & Research publication & hasPMID, publicationYear \\
+Author & Researcher & lastName, foreName, initials \\
+Authorship & Article-Author relationship & authorOrder \\
+Organization & Research organization & dbpediaLink \\
+Institution & Educational institution & wikidataLink \\
+Affiliation & Author affiliation & city, state, country \\
+Employment & Employment record & startYear, endYear \\
+Education & Education record & degree \\
+NIHProject & NIH funding project & projectNumber, piName \\
+BioEntity & Biological entity & entityType, entityName \\
+PublicationStatus & Enumeration & \{Published, Preprint, ...\} \\
+\hline
+\end{tabular}
+\end{table}
+
+%==============================================================================
+\section{Ontology Design}
+%==============================================================================
+
+\subsection{Classes (20+ as Required)}
+
+Our ontology contains over 20 classes:
+
+\begin{enumerate}
+    \item \textbf{Core}: Article, Author, Authorship, PublicationYear
+    \item \textbf{Organizational}: Organization, Institution, Affiliation
+    \item \textbf{Career}: Employment, Education
+    \item \textbf{Funding}: NIHProject
+    \item \textbf{Bio-Medical}: BioEntity, Gene, Chemical, Disease, Species, Mutation
+    \item \textbf{Enumeration}: PublicationStatus
+    \item \textbf{Defined Classes}: ActiveAuthor, AnonymousAuthor, ResearchEntity, ProlificAuthor, SingleAuthorArticle, MultiAuthorArticle
+\end{enumerate}
+
+\subsection{Enumeration Class}
+
+\begin{lstlisting}[language=Python, caption=Enumeration Class Definition]
+class PublicationStatus(Thing):
+    """Enumeration of publication statuses"""
+    pass
+
+published = PublicationStatus("Published")
+preprint = PublicationStatus("Preprint")
+retracted = PublicationStatus("Retracted")
+in_review = PublicationStatus("InReview")
+
+PublicationStatus.equivalent_to = [
+    OneOf([published, preprint, retracted, in_review])
+]
+\end{lstlisting}
+
+\subsection{Cardinality Restrictions}
+
+\begin{lstlisting}[language=Python, caption=Cardinality Restrictions]
+# Every Article must have at least 1 author
+Article.is_a.append(writtenBy.min(1, Author))
+
+# Every Article must have exactly 1 PMID
+Article.is_a.append(hasPMID.exactly(1, str))
+
+# Article may have at most 1 status
+Article.is_a.append(hasStatus.max(1, PublicationStatus))
+\end{lstlisting}
+
+\subsection{Intersection, Union, and Complement Classes}
+
+\begin{lstlisting}[language=Python, caption=Defined Classes]
+# INTERSECTION: Author with known career start year
+class ActiveAuthor(Author):
+    equivalent_to = [Author & careerStartYear.some(int)]
+
+# UNION: Any research-related entity
+class ResearchEntity(Thing):
+    equivalent_to = [Author | Article]
+
+# COMPLEMENT: Author without career info
+class AnonymousAuthor(Author):
+    equivalent_to = [Author & Not(ActiveAuthor)]
+
+# Additional defined classes for reasoning
+class ProlificAuthor(Author):
+    equivalent_to = [Author & writtenBy.min(5, Article)]
+
+class SingleAuthorArticle(Article):
+    equivalent_to = [Article & writtenBy.exactly(1, Author)]
+
+class MultiAuthorArticle(Article):
+    equivalent_to = [Article & writtenBy.min(2, Author)]
+\end{lstlisting}
+
+\subsection{Object Properties}
+
+\begin{table}[H]
+\centering
+\caption{Object Properties}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Property} & \textbf{Domain} & \textbf{Range} & \textbf{Characteristics} \\
+\hline
+writtenBy & Article & Author & - \\
+hasAuthorship & Article & Authorship & - \\
+hasPrimaryAuthor & Article & Author & Functional \\
+hasStatus & Article & PublicationStatus & Functional \\
+refersToAuthor & Authorship & Author & - \\
+hasAffiliation & Author & Affiliation & - \\
+affiliatedWith & Affiliation & Organization & - \\
+hasEmployment & Author & Employment & - \\
+employedAt & Employment & Organization & - \\
+hasEducation & Author & Education & - \\
+educatedAt & Education & Institution & - \\
+hasProject & Author & NIHProject & - \\
+mentionsBioEntity & Article & BioEntity & - \\
+sameAs & Thing & Thing & Symmetric \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Data Properties}
+
+\begin{table}[H]
+\centering
+\caption{Data Properties}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Property} & \textbf{Domain} & \textbf{Range} & \textbf{Characteristics} \\
+\hline
+hasPMID & Article & string & Functional, InverseFunctional \\
+lastName & Author & string & - \\
+foreName & Author & string & - \\
+initials & Author & string & - \\
+authorOrder & Authorship & int & - \\
+publicationYear & Article & int & Functional \\
+careerStartYear & Author & int & - \\
+city & Affiliation & string & - \\
+state & Affiliation & string & - \\
+country & Affiliation & string & - \\
+startYear & Employment & int & - \\
+endYear & Employment & int & - \\
+degree & Education & string & - \\
+projectNumber & NIHProject & string & - \\
+dbpediaLink & Organization & string & - \\
+wikidataLink & Institution & string & - \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Functional and Inverse Functional Properties}
+
+\begin{lstlisting}[language=Python, caption=Property Characteristics]
+# Functional Properties
+class hasPrimaryAuthor(ObjectProperty, FunctionalProperty):
+    domain = [Article]
+    range = [Author]
+
+class hasPMID(DataProperty, FunctionalProperty):
+    domain = [Article]
+    range = [str]
+
+# Inverse Functional Property
+hasPMID.is_a.append(InverseFunctionalProperty)
+\end{lstlisting}
+
+%==============================================================================
+\section{Graph Generation using Python}
+%==============================================================================
+
+\subsection{Tools Used}
+
+\begin{itemize}
+    \item \textbf{OWLReady2}: Python library for OWL ontology manipulation
+    \item \textbf{Pandas}: Data processing and CSV handling
+    \item \textbf{RDFLib}: RDF graph manipulation
+    \item \textbf{Flask}: Web application framework
+\end{itemize}
+
+\subsection{Pipeline Scripts}
+
+\begin{table}[H]
+\centering
+\caption{Python Scripts Pipeline}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Script} & \textbf{Input} & \textbf{Output} \\
+\hline
+ontology\_core.py & - & pkg2020\_core.owl \\
+ontology\_constraints.py & pkg2020\_core.owl & pkg2020\_constrained.owl \\
+populate\_authors\_articles.py & OA01 CSV & pkg2020\_populated\_authors.owl \\
+populate\_affiliations.py & OA04 CSV & pkg2020\_step4\_affiliations.owl \\
+populate\_employment.py & OA05 CSV & pkg2020\_step5\_employment.owl \\
+populate\_education.py & OA06 CSV & pkg2020\_step6\_education.owl \\
+populate\_bioentities.py & OA02, OA03 & pkg2020\_step7\_bioentities.owl \\
+populate\_nih\_projects.py & OA07 CSV & pkg2020\_final.owl \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Sample Code: Populating Authors}
+
+\begin{lstlisting}[language=Python, caption=Author Population Script]
+import pandas as pd
+from owlready2 import *
+
+onto = get_ontology("pkg2020_constrained.owl").load()
+df = pd.read_csv("data/OA01_Author_List.csv", nrows=5000)
+
+author_cache = set()
+article_cache = set()
+
+with onto:
+    for idx, row in df.iterrows():
+        pmid = str(row["PMID"])
+        and_id = str(row["AND_ID"])
+
+        # Create Article
+        if f"Article_{pmid}" not in article_cache:
+            article = onto.Article(f"Article_{pmid}")
+            article.hasPMID = [pmid]
+            article_cache.add(f"Article_{pmid}")
+
+        # Create Author
+        if f"Author_{and_id}" not in author_cache:
+            author = onto.Author(f"Author_{and_id}")
+            author.lastName = [str(row["LastName"])]
+            author.foreName = [str(row["ForeName"])]
+            author_cache.add(f"Author_{and_id}")
+
+onto.save(file="pkg2020_populated_authors.owl", format="rdfxml")
+\end{lstlisting}
+
+%==============================================================================
+\section{External Linking (5-Star Linked Data)}
+%==============================================================================
+
+\subsection{Linking Strategy}
+
+We linked our dataset to external knowledge bases to achieve 5-star linked data:
+
+\begin{itemize}
+    \item \textbf{Organizations} $\rightarrow$ DBpedia resources
+    \item \textbf{Institutions} $\rightarrow$ Wikidata entities
+    \item \textbf{Authors} $\rightarrow$ ORCID (potential)
+    \item \textbf{Articles} $\rightarrow$ PubMed (via PMID)
+\end{itemize}
+
+\subsection{Linking Implementation}
+
+\begin{lstlisting}[language=Python, caption=External Linking Code]
+def generate_dbpedia_uri(name):
+    clean_name = re.sub(r'[^a-zA-Z0-9\s]', '', str(name))
+    clean_name = clean_name.strip().replace(' ', '_')
+    return f"http://dbpedia.org/resource/{quote(clean_name)}"
+
+# Link organizations to DBpedia
+for org in Organization.instances():
+    org_name = org.name.replace('_', ' ')
+    dbpedia_uri = generate_dbpedia_uri(org_name)
+    org.dbpediaLink = [dbpedia_uri]
+\end{lstlisting}
+
+%==============================================================================
+\section{Reasoning Scenarios}
+%==============================================================================
+
+\subsection{Reasoning Implementation}
+
+\begin{lstlisting}[language=Python, caption=Reasoning with HermiT]
+from owlready2 import *
+
+onto = get_ontology("pkg2020_final.owl").load()
+
+# Run HermiT reasoner
+with onto:
+    sync_reasoner(infer_property_values=True)
+
+# Check classified instances
+for cls in [ActiveAuthor, AnonymousAuthor, ProlificAuthor]:
+    print(f"{cls.name}: {len(list(cls.instances()))} instances")
+\end{lstlisting}
+
+\subsection{Reasoning Results}
+
+The reasoner successfully:
+\begin{enumerate}
+    \item Verified ontology consistency
+    \item Classified authors into ActiveAuthor and AnonymousAuthor
+    \item Identified ProlificAuthors with 5+ publications
+    \item Classified SingleAuthorArticle and MultiAuthorArticle
+\end{enumerate}
+
+%==============================================================================
+\section{SPARQL Queries}
+%==============================================================================
+
+\subsection{Query 1: Authors with Multiple Affiliations}
+
+\begin{lstlisting}[language=SPARQL, caption=Multiple Affiliations Query]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+
+SELECT ?author (COUNT(DISTINCT ?org) AS ?orgCount)
+WHERE {
+    ?author a pkg:Author .
+    ?author pkg:hasAffiliation ?aff .
+    ?aff pkg:affiliatedWith ?org .
+}
+GROUP BY ?author
+HAVING (COUNT(DISTINCT ?org) > 1)
+ORDER BY DESC(?orgCount)
+LIMIT 20
+\end{lstlisting}
+
+\subsection{Query 2: Articles Mentioning Genes}
+
+\begin{lstlisting}[language=SPARQL, caption=BioEntity Query]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+
+SELECT ?article ?gene ?geneName
+WHERE {
+    ?article a pkg:Article .
+    ?article pkg:mentionsBioEntity ?gene .
+    ?gene a pkg:Gene .
+    OPTIONAL { ?gene pkg:entityName ?geneName }
+}
+LIMIT 50
+\end{lstlisting}
+
+\subsection{Query 3: Author Collaboration Network}
+
+\begin{lstlisting}[language=SPARQL, caption=Collaboration Query]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+
+SELECT ?author1 ?author2 (COUNT(?article) AS ?collaborations)
+WHERE {
+    ?article a pkg:Article .
+    ?article pkg:writtenBy ?author1 .
+    ?article pkg:writtenBy ?author2 .
+    FILTER (?author1 < ?author2)
+}
+GROUP BY ?author1 ?author2
+ORDER BY DESC(?collaborations)
+LIMIT 50
+\end{lstlisting}
+
+\subsection{Query 4: Federated Query to DBpedia}
+
+\begin{lstlisting}[language=SPARQL, caption=Federated Query]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+
+SELECT ?org ?dbpediaLink ?abstract
+WHERE {
+    ?org a pkg:Organization .
+    ?org pkg:dbpediaLink ?dbpediaLink .
+    
+    SERVICE <http://dbpedia.org/sparql> {
+        OPTIONAL { ?dbpediaLink dbo:abstract ?abstract }
+        FILTER (lang(?abstract) = 'en')
+    }
+}
+LIMIT 10
+\end{lstlisting}
+
+%==============================================================================
+\section{Web Application (BONUS)}
+%==============================================================================
+
+\subsection{Application Overview}
+
+We developed a Flask-based web application for exploring the knowledge graph with the following features:
+
+\begin{itemize}
+    \item Modern, responsive UI with glassmorphism design
+    \item Real-time statistics dashboard
+    \item Search across all 9 entity types
+    \item Click-to-search functionality
+\end{itemize}
+
+\subsection{Entity Types Searchable}
+
+\begin{enumerate}
+    \item Authors
+    \item Articles
+    \item Organizations
+    \item Affiliations
+    \item Employment
+    \item Education
+    \item BioEntities
+    \item NIH Projects
+    \item Institutions
+\end{enumerate}
+
+\subsection{Running the Application}
+
+\begin{lstlisting}[language=bash, caption=Running the Web App]
+cd scripts
+pip install flask owlready2
+python webapp.py
+# Open http://localhost:5000
+\end{lstlisting}
+
+%==============================================================================
+\section{Results and Statistics}
+%==============================================================================
+
+\subsection{Generated Data}
+
+\begin{table}[H]
+\centering
+\caption{Ontology Statistics}
+\begin{tabular}{|l|r|}
+\hline
+\textbf{Entity} & \textbf{Count} \\
+\hline
+Articles & 2,015 \\
+Authors & 4,711 \\
+Organizations & 4,405 \\
+Affiliations & Varies \\
+Employment Records & Varies \\
+Education Records & Varies \\
+NIH Projects & 30 \\
+BioEntities & Varies \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{OWL Files Generated}
+
+\begin{table}[H]
+\centering
+\caption{Generated OWL Files}
+\begin{tabular}{|l|r|}
+\hline
+\textbf{File} & \textbf{Size} \\
+\hline
+pkg2020\_core.owl & 2.6 KB \\
+pkg2020\_constrained.owl & 4.3 KB \\
+pkg2020\_populated\_authors.owl & 3.8 MB \\
+pkg2020\_step4\_affiliations.owl & 7.1 MB \\
+pkg2020\_final.owl & 7.1 MB \\
+\hline
+\end{tabular}
+\end{table}
+
+%==============================================================================
+\section{Visualization}
+%==============================================================================
+
+\subsection{Tools Used}
+
+\begin{itemize}
+    \item \textbf{Protégé}: Desktop ontology editor and visualizer
+    \item \textbf{GraphDB}: Triple store with SPARQL endpoint
+    \item \textbf{WebVOWL}: Online ontology visualization
+    \item \textbf{Custom Flask App}: Interactive web-based explorer
+\end{itemize}
+
+\subsection{Visualization Guide}
+
+To visualize the ontology:
+
+\begin{enumerate}
+    \item Open \texttt{owl/pkg2020\_constrained.owl} in Protégé
+    \item Go to Window $\rightarrow$ Tabs $\rightarrow$ OntoGraf
+    \item Select classes to visualize
+    \item Export as image for reports
+\end{enumerate}
+
+%==============================================================================
+\section{Reflection}
+%==============================================================================
+
+\subsection{Learning Outcomes}
+
+Through this project, we learned:
+
+\begin{enumerate}
+    \item How to design ontologies following OWL/RDF standards
+    \item The importance of defined classes for reasoning
+    \item How to link data to external knowledge bases
+    \item The power of SPARQL for semantic querying
+    \item Practical application of knowledge representation concepts
+\end{enumerate}
+
+\subsection{Added Value of Linked Data}
+
+Converting non-RDF data to linked data enabled:
+
+\begin{itemize}
+    \item Semantic querying across heterogeneous datasets
+    \item Reasoning over implicit relationships
+    \item Integration with global knowledge bases (DBpedia, Wikidata)
+    \item FAIR data principles compliance
+    \item Interoperability with other linked data systems
+\end{itemize}
+
+\subsection{Challenges Faced}
+
+\begin{enumerate}
+    \item Large file sizes required memory optimization
+    \item Special characters in organization names caused parsing issues
+    \item Reasoner installation and configuration
+    \item Balancing between sample size and processing time
+\end{enumerate}
+
+%==============================================================================
+\section{Conclusion}
+%==============================================================================
+
+This project successfully converted the PKG2020S4 bibliometric dataset into a comprehensive linked data knowledge graph. We achieved:
+
+\begin{enumerate}
+    \item \textbf{Ontology Design}: 20+ classes with all required axioms
+    \item \textbf{Data Population}: Modular Python pipeline for 7 CSV files
+    \item \textbf{Reasoning}: Consistency checking and classification
+    \item \textbf{External Linking}: 5-star linked data with DBpedia/Wikidata
+    \item \textbf{SPARQL Queries}: 7 competency questions answered
+    \item \textbf{BONUS}: Interactive web application
+\end{enumerate}
+
+The project demonstrates the practical application of knowledge representation and reasoning concepts learned in the course.
+
+%==============================================================================
+\section{References}
+%==============================================================================
+
+\begin{enumerate}
+    \item Lamy, J. B. (2017). OWLReady: Ontology-oriented programming in Python. Artificial Intelligence in Medicine.
+    \item W3C. (2012). OWL 2 Web Ontology Language Primer.
+    \item DBpedia Association. (2024). DBpedia Knowledge Base.
+    \item PubMed. (2024). NCBI PubMed Database.
+\end{enumerate}
+
+%==============================================================================
+\section{Appendix: Project Repository}
+%==============================================================================
+
+The complete project code is available at:
+
+\url{https://github.com/Zain-Haider-ai-63/Knowlege-Graphs-Project}
+
+\subsection{Repository Structure}
+
+\begin{lstlisting}
+Knowledge_Graphs_Project/
++-- scripts/           # Python scripts
++-- owl/               # Generated OWL files
++-- docs/              # Documentation
++-- requirements.txt   # Dependencies
++-- README.md          # Project overview
+\end{lstlisting}
+
+\end{document}
