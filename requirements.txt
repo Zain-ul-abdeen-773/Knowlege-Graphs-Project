@@ -1,0 +1,4 @@
+owlready2>=0.40
+pandas>=1.5.0
+flask>=2.0.0
+rdflib>=6.0.0
