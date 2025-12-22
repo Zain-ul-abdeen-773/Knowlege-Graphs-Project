@@ -100,9 +100,10 @@ def compute_stats():
     return STATS_CACHE
 
 
-# Initialize at startup
+# Initialize at startup - use fallback stats to save memory
 print("\n🚀 Initializing PKG2020 Knowledge Graph Explorer...")
-compute_stats()
+print("📊 Using pre-computed statistics (memory optimized)")
+STATS_CACHE = FALLBACK_STATS  # Use cached stats to stay under memory limit
 print("🎉 Ready to serve requests!\n")
 
 
