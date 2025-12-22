@@ -83,8 +83,22 @@ python webapp.py
 - Organizations → DBpedia
 - Institutions → Wikidata
 
-## SPARQL Queries
-7 competency queries available in `scripts/sparql_queries.py`
+## SPARQL Competency Queries
+15 competency queries available in `scripts/sparql_queries.py`:
+- Authors with multiple institutions
+- Prolific authors by article count
+- Author collaboration networks
+- Articles mentioning genes/diseases
+- Mutation-disease correlations
+- Bio-entity distribution
+- Top organizations by affiliations
+- Geographic distribution of affiliations
+- Education by institution
+- Employment timeline
+- Authors with doctoral degrees
+- NIH-funded authors
+- Principal investigators
+- Author complete profiles
 
 ## License
 MIT
