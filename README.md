@@ -55,9 +55,43 @@ python populate_nih_projects.py
 python reasoning.py
 python link_external_data.py
 
-# BONUS: Web Application
-python webapp.py
+# Web Application with SPARQL Endpoint
+python webapp_sparql.py
 # Open http://localhost:5000
+```
+
+## 🌐 SPARQL Endpoint
+
+The project includes a fully-featured SPARQL endpoint:
+
+### Quick Start
+```bash
+cd scripts
+python webapp_sparql.py --port 5000
+```
+
+### Endpoints
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/sparql` | GET/POST | Main SPARQL endpoint |
+| `/api/stats` | GET | Graph statistics |
+| `/api/queries` | GET | List competency queries |
+| `/api/query/{key}` | GET | Run predefined query |
+| `/api/search?type=Author&q=term` | GET | Search entities |
+
+### Example Query
+```bash
+curl -X POST http://localhost:5000/sparql \
+  -d "query=PREFIX pkg: <http://example.org/pkg2020/ontology.owl#> SELECT ?author WHERE { ?author a pkg:Author } LIMIT 10"
+```
+
+### Docker Deployment
+```bash
+# Start Fuseki triplestore and webapp
+docker-compose up -d
+
+# Load data into Fuseki
+python scripts/load_to_fuseki.py
 ```
 
 ## Ontology Features
@@ -98,7 +132,3 @@ python webapp.py
 - Authors with doctoral degrees
 - NIH-funded authors
 - Principal investigators
-- Author complete profiles
-
-## License
-MIT
