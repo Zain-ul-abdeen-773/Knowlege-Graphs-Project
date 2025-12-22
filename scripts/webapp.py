@@ -1,304 +1,307 @@
 """
-PKG2020 Knowledge Graph - Web Application Demo (BONUS)
-Flask-based application with comprehensive search across all entity types
+PKG2020 Knowledge Graph - Professional Web Application
+Modern UI with D3.js graphs, animations, and SPARQL query visualization
 """
-from flask import Flask, request, jsonify
-from owlready2 import *
+from flask import Flask, request, jsonify, Response
+from flask_cors import CORS
+from rdflib import Graph, Namespace, URIRef
+import json
 import os
 
 app = Flask(__name__)
-ONTOLOGY_PATH = "../owl/pkg2020_final.owl"
+CORS(app)
 
-def get_ontology_stats():
-    onto = get_ontology(ONTOLOGY_PATH).load()
-    stats = {
-        "classes": len(list(onto.classes())),
-        "individuals": {}
-    }
-    for cls in onto.classes():
-        instances = list(cls.instances())
-        if instances:
-            stats["individuals"][cls.name] = len(instances)
-    return stats
+# Configuration
+TTL_PATH = "../owl/pkg2020_final.ttl"
+OWL_PATH = "../owl/pkg2020_final.owl"
 
-def search_entity(entity_type, query):
-    """Generic search for any entity type"""
-    onto = get_ontology(ONTOLOGY_PATH).load()
-    
-    entity_map = {
-        "authors": ("Author", lambda a: {
-            "id": a.name,
-            "name": f"{a.foreName[0] if a.foreName else ''} {a.lastName[0] if a.lastName else ''}".strip(),
-            "extra": f"{len(list(a.hasAffiliation)) if hasattr(a, 'hasAffiliation') else 0} affiliations"
-        }),
-        "articles": ("Article", lambda a: {
-            "id": a.name,
-            "name": f"PMID: {a.hasPMID[0] if a.hasPMID else 'N/A'}",
-            "extra": f"{len(list(a.writtenBy)) if hasattr(a, 'writtenBy') else 0} authors"
-        }),
-        "organizations": ("Organization", lambda o: {
-            "id": o.name,
-            "name": o.name.replace("_", " "),
-            "extra": "Organization"
-        }),
-        "affiliations": ("Affiliation", lambda a: {
-            "id": a.name,
-            "name": a.name,
-            "extra": f"{a.city[0] if hasattr(a,'city') and a.city else ''}, {a.country[0] if hasattr(a,'country') and a.country else ''}"
-        }),
-        "employment": ("Employment", lambda e: {
-            "id": e.name,
-            "name": e.name,
-            "extra": f"{e.startYear[0] if hasattr(e,'startYear') and e.startYear else '?'} - {e.endYear[0] if hasattr(e,'endYear') and e.endYear else 'Present'}"
-        }),
-        "education": ("Education", lambda e: {
-            "id": e.name,
-            "name": e.name,
-            "extra": f"{e.degree[0] if hasattr(e,'degree') and e.degree else 'Degree N/A'}"
-        }),
-        "bioentities": ("BioEntity", lambda b: {
-            "id": b.name,
-            "name": b.entityName[0] if hasattr(b,'entityName') and b.entityName else b.name,
-            "extra": b.entityType[0] if hasattr(b,'entityType') and b.entityType else "BioEntity"
-        }),
-        "nihprojects": ("NIHProject", lambda p: {
-            "id": p.name,
-            "name": p.projectNumber[0] if hasattr(p,'projectNumber') and p.projectNumber else p.name,
-            "extra": p.piName[0] if hasattr(p,'piName') and p.piName else "PI N/A"
-        }),
-        "institutions": ("Institution", lambda i: {
-            "id": i.name,
-            "name": i.name.replace("_", " "),
-            "extra": "Institution"
-        })
+# Initialize RDF Graph
+g = None
+
+def load_graph():
+    global g
+    if g is None:
+        g = Graph()
+        if os.path.exists(TTL_PATH):
+            g.parse(TTL_PATH, format="turtle")
+        elif os.path.exists(OWL_PATH):
+            g.parse(OWL_PATH, format="xml")
+    return g
+
+# Competency Questions with SPARQL Queries
+COMPETENCY_QUERIES = {
+    "cq1": {
+        "title": "1. Authors with Multiple Institutions",
+        "description": "Which authors have published in multiple institutions?",
+        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT ?author (COUNT(DISTINCT ?org) AS ?orgCount)
+WHERE {
+    ?author a pkg:Author .
+    ?author pkg:hasAffiliation ?aff .
+    ?aff pkg:affiliatedWith ?org .
+}
+GROUP BY ?author
+HAVING (COUNT(DISTINCT ?org) > 1)
+ORDER BY DESC(?orgCount)
+LIMIT 20"""
+    },
+    "cq2": {
+        "title": "2. Articles Mentioning Genes",
+        "description": "Which articles mention specific bio-entities (genes)?",
+        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT ?article ?pmid ?gene ?geneName
+WHERE {
+    ?article a pkg:Article .
+    ?article pkg:hasPMID ?pmid .
+    ?article pkg:mentionsBioEntity ?gene .
+    ?gene a pkg:Gene .
+    OPTIONAL { ?gene pkg:entityName ?geneName }
+}
+LIMIT 50"""
+    },
+    "cq3": {
+        "title": "3. Author Collaborations",
+        "description": "Which authors have collaborated on joint publications?",
+        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT ?author1 ?author2 (COUNT(?article) AS ?collaborations)
+WHERE {
+    ?article a pkg:Article .
+    ?article pkg:writtenBy ?author1 .
+    ?article pkg:writtenBy ?author2 .
+    FILTER (str(?author1) < str(?author2))
+}
+GROUP BY ?author1 ?author2
+ORDER BY DESC(?collaborations)
+LIMIT 30"""
+    },
+    "cq4": {
+        "title": "4. Authors with NIH Funding",
+        "description": "Which authors have NIH funding?",
+        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT ?author ?project ?projectNumber
+WHERE {
+    ?author a pkg:Author .
+    ?author pkg:hasProject ?project .
+    ?project pkg:projectNumber ?projectNumber .
+}
+LIMIT 50"""
+    },
+    "cq5": {
+        "title": "5. Prolific Authors",
+        "description": "Most prolific authors by article count",
+        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT ?author (COUNT(?article) AS ?articleCount)
+WHERE {
+    ?article a pkg:Article .
+    ?article pkg:writtenBy ?author .
+}
+GROUP BY ?author
+ORDER BY DESC(?articleCount)
+LIMIT 20"""
+    },
+    "cq6": {
+        "title": "6. Top Organizations",
+        "description": "Organizations with most affiliated authors",
+        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT ?org (COUNT(DISTINCT ?author) AS ?authorCount)
+WHERE {
+    ?author a pkg:Author .
+    ?author pkg:hasAffiliation ?aff .
+    ?aff pkg:affiliatedWith ?org .
+}
+GROUP BY ?org
+ORDER BY DESC(?authorCount)
+LIMIT 20"""
+    },
+    "cq7": {
+        "title": "7. Articles with Mutations",
+        "description": "Articles mentioning mutations and diseases",
+        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT ?article ?pmid ?mutation
+WHERE {
+    ?article a pkg:Article .
+    ?article pkg:hasPMID ?pmid .
+    ?article pkg:mentionsBioEntity ?mutation .
+    ?mutation a pkg:Mutation .
+}
+LIMIT 50"""
+    },
+    "cq8": {
+        "title": "8. Dataset Statistics",
+        "description": "Count of all entity types in the knowledge graph",
+        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT ?class (COUNT(?instance) AS ?count)
+WHERE {
+    ?instance a ?class .
+    FILTER(STRSTARTS(STR(?class), "http://example.org/pkg2020/"))
+}
+GROUP BY ?class
+ORDER BY DESC(?count)"""
+    },
+    "cq9": {
+        "title": "9. All Classes in Ontology",
+        "description": "List all 23 classes defined in the ontology",
+        "query": """PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT DISTINCT ?class ?label
+WHERE {
+    { ?class a owl:Class } UNION { ?class a rdfs:Class }
+    FILTER(STRSTARTS(STR(?class), "http://example.org/pkg2020/"))
+    OPTIONAL { ?class rdfs:label ?label }
+}
+ORDER BY ?class"""
+    },
+    "cq10": {
+        "title": "10. Complete Graph Sample",
+        "description": "Sample of the entire dataset structure",
+        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT ?subject ?predicate ?object
+WHERE {
+    ?subject ?predicate ?object .
+    FILTER(STRSTARTS(STR(?subject), "http://example.org/pkg2020/"))
+}
+LIMIT 100"""
     }
-    
-    if entity_type not in entity_map:
-        return []
-    
-    class_name, formatter = entity_map[entity_type]
-    cls = getattr(onto, class_name, None)
-    if not cls:
-        return []
-    
-    results = []
-    for entity in cls.instances():
-        if query.lower() in entity.name.lower():
+}
+
+# All 23 Classes
+ALL_CLASSES = [
+    "Article", "Author", "Authorship", "PublicationYear", "PublicationStatus",
+    "Organization", "Institution", "Affiliation", "Employment", "Education",
+    "NIHProject", "BioEntity", "Gene", "Chemical", "Disease", "Species", "Mutation",
+    "ActiveAuthor", "AnonymousAuthor", "ResearchEntity", 
+    "ProlificAuthor", "SingleAuthorArticle", "MultiAuthorArticle"
+]
+
+@app.route('/api/stats')
+def get_stats():
+    try:
+        graph = load_graph()
+        pkg = Namespace("http://example.org/pkg2020/ontology.owl#")
+        
+        stats = {"classes": 23, "triples": len(graph), "individuals": {}}
+        
+        for cls in ALL_CLASSES:
+            query = f"""
+            PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+            SELECT (COUNT(?s) AS ?count) WHERE {{ ?s a pkg:{cls} }}
+            """
             try:
-                results.append(formatter(entity))
+                result = list(graph.query(query))
+                if result:
+                    stats["individuals"][cls] = int(result[0][0])
             except:
-                results.append({"id": entity.name, "name": entity.name, "extra": ""})
-        if len(results) >= 30:
-            break
-    return results
+                stats["individuals"][cls] = 0
+        
+        return jsonify(stats)
+    except Exception as e:
+        return jsonify({"error": str(e), "classes": 23, "triples": 0, "individuals": {}})
 
-HTML_TEMPLATE = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PKG2020 Knowledge Graph Explorer</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            min-height: 100vh;
-            color: #fff;
-        }
-        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        h1 {
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 2.5rem;
-            background: linear-gradient(90deg, #e94560, #f39c12);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-        .stat-card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.2);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .stat-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.15); }
-        .stat-card.active { border-color: #e94560; background: rgba(233,69,96,0.2); }
-        .stat-card h3 { font-size: 1.5rem; color: #e94560; }
-        .stat-card p { color: #aaa; font-size: 0.85rem; }
-        .search-box {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        input, select, button {
-            padding: 1rem;
-            border-radius: 10px;
-            border: none;
-            font-size: 1rem;
-        }
-        select { background: rgba(255,255,255,0.15); color: #fff; min-width: 180px; }
-        select option { background: #16213e; }
-        input { flex: 1; background: rgba(255,255,255,0.1); color: #fff; }
-        input::placeholder { color: #888; }
-        button {
-            background: linear-gradient(90deg, #e94560, #f39c12);
-            color: #fff;
-            cursor: pointer;
-            transition: transform 0.2s;
-            padding: 1rem 2rem;
-        }
-        button:hover { transform: scale(1.05); }
-        .results {
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            padding: 1.5rem;
-            max-height: 500px;
-            overflow-y: auto;
-        }
-        .result-item {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .result-item:hover { background: rgba(255,255,255,0.15); }
-        .badge {
-            background: #e94560;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            white-space: nowrap;
-        }
-        .result-name { font-weight: 600; }
-        .result-id { font-size: 0.8rem; color: #888; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>🧬 PKG2020 Knowledge Graph Explorer</h1>
+@app.route('/api/query', methods=['POST'])
+def run_query():
+    try:
+        graph = load_graph()
+        data = request.get_json()
+        query = data.get('query', '')
         
-        <div class="stats-grid" id="stats"></div>
+        results = graph.query(query)
         
-        <div class="search-box">
-            <select id="searchType">
-                <option value="authors">👤 Authors</option>
-                <option value="articles">📄 Articles</option>
-                <option value="organizations">🏢 Organizations</option>
-                <option value="affiliations">📍 Affiliations</option>
-                <option value="employment">💼 Employment</option>
-                <option value="education">🎓 Education</option>
-                <option value="bioentities">🧬 BioEntities</option>
-                <option value="nihprojects">🔬 NIH Projects</option>
-                <option value="institutions">🏫 Institutions</option>
-            </select>
-            <input type="text" id="searchQuery" placeholder="Enter search query... (e.g., Author_, Article_, University)">
-            <button onclick="search()">🔍 Search</button>
-        </div>
+        # Convert to JSON-serializable format
+        columns = [str(v) for v in results.vars] if results.vars else []
+        rows = []
+        for row in results:
+            rows.append([str(cell) if cell else "" for cell in row])
         
-        <div class="results" id="results">
-            <p style="text-align:center;color:#888;">Select an entity type and enter a search query</p>
-        </div>
-    </div>
+        return jsonify({"columns": columns, "rows": rows, "count": len(rows)})
+    except Exception as e:
+        return jsonify({"error": str(e), "columns": [], "rows": []})
+
+@app.route('/api/competency-queries')
+def get_competency_queries():
+    return jsonify(COMPETENCY_QUERIES)
+
+@app.route('/api/classes')
+def get_classes():
+    return jsonify({"classes": ALL_CLASSES, "count": len(ALL_CLASSES)})
+
+@app.route('/api/graph-data')
+def get_graph_data():
+    """Get data for D3.js force-directed graph showing all classes and relationships"""
+    nodes = []
+    links = []
     
-    <script>
-        async function loadStats() {
-            const res = await fetch('/api/stats');
-            const data = await res.json();
-            const ind = data.individuals;
-            document.getElementById('stats').innerHTML = `
-                <div class="stat-card" onclick="setSearch('authors')"><h3>${ind.Author || 0}</h3><p>Authors</p></div>
-                <div class="stat-card" onclick="setSearch('articles')"><h3>${ind.Article || 0}</h3><p>Articles</p></div>
-                <div class="stat-card" onclick="setSearch('organizations')"><h3>${ind.Organization || 0}</h3><p>Organizations</p></div>
-                <div class="stat-card" onclick="setSearch('affiliations')"><h3>${ind.Affiliation || 0}</h3><p>Affiliations</p></div>
-                <div class="stat-card" onclick="setSearch('employment')"><h3>${ind.Employment || 0}</h3><p>Employment</p></div>
-                <div class="stat-card" onclick="setSearch('education')"><h3>${ind.Education || 0}</h3><p>Education</p></div>
-                <div class="stat-card" onclick="setSearch('bioentities')"><h3>${ind.BioEntity || 0}</h3><p>BioEntities</p></div>
-                <div class="stat-card" onclick="setSearch('nihprojects')"><h3>${ind.NIHProject || 0}</h3><p>NIH Projects</p></div>
-            `;
-        }
-        
-        function setSearch(type) {
-            document.getElementById('searchType').value = type;
-            document.getElementById('searchQuery').value = '';
-            document.getElementById('searchQuery').focus();
-        }
-        
-        async function search() {
-            const type = document.getElementById('searchType').value;
-            const query = document.getElementById('searchQuery').value;
-            if (!query) {
-                document.getElementById('results').innerHTML = '<p style="text-align:center;color:#888;">Please enter a search query</p>';
-                return;
-            }
-            
-            document.getElementById('results').innerHTML = '<p style="text-align:center;color:#888;">Searching...</p>';
-            
-            const res = await fetch(`/api/search/${type}?q=${encodeURIComponent(query)}`);
-            const data = await res.json();
-            
-            if (data.length === 0) {
-                document.getElementById('results').innerHTML = '<p style="text-align:center;color:#888;">No results found</p>';
-                return;
-            }
-            
-            let html = '';
-            data.forEach(item => {
-                html += `<div class="result-item">
-                    <div>
-                        <div class="result-name">${item.name}</div>
-                        <div class="result-id">${item.id}</div>
-                    </div>
-                    <span class="badge">${item.extra}</span>
-                </div>`;
-            });
-            document.getElementById('results').innerHTML = html;
-        }
-        
-        document.getElementById('searchQuery').addEventListener('keypress', e => {
-            if (e.key === 'Enter') search();
-        });
-        
-        loadStats();
-    </script>
-</body>
-</html>
-"""
+    # Add all 23 classes as nodes
+    class_colors = {
+        "Article": "#e94560", "Author": "#0f3460", "Authorship": "#16213e",
+        "Organization": "#1a1a2e", "Institution": "#533483", "Affiliation": "#e94560",
+        "Employment": "#f39c12", "Education": "#3498db", "NIHProject": "#2ecc71",
+        "BioEntity": "#9b59b6", "Gene": "#e74c3c", "Chemical": "#1abc9c",
+        "Disease": "#f1c40f", "Species": "#34495e", "Mutation": "#e67e22",
+        "PublicationYear": "#95a5a6", "PublicationStatus": "#7f8c8d",
+        "ActiveAuthor": "#27ae60", "AnonymousAuthor": "#c0392b",
+        "ResearchEntity": "#2980b9", "ProlificAuthor": "#8e44ad",
+        "SingleAuthorArticle": "#d35400", "MultiAuthorArticle": "#16a085"
+    }
+    
+    for i, cls in enumerate(ALL_CLASSES):
+        nodes.append({
+            "id": cls,
+            "group": i % 5,
+            "color": class_colors.get(cls, "#666"),
+            "size": 30 if cls in ["Article", "Author", "Organization"] else 20
+        })
+    
+    # Define relationships between classes
+    relationships = [
+        ("Article", "Author", "writtenBy"),
+        ("Article", "Authorship", "hasAuthorship"),
+        ("Article", "BioEntity", "mentionsBioEntity"),
+        ("Article", "PublicationStatus", "hasStatus"),
+        ("Authorship", "Author", "refersToAuthor"),
+        ("Author", "Affiliation", "hasAffiliation"),
+        ("Author", "Employment", "hasEmployment"),
+        ("Author", "Education", "hasEducation"),
+        ("Author", "NIHProject", "hasProject"),
+        ("Affiliation", "Organization", "affiliatedWith"),
+        ("Employment", "Organization", "employedAt"),
+        ("Education", "Institution", "educatedAt"),
+        ("Gene", "BioEntity", "subClassOf"),
+        ("Chemical", "BioEntity", "subClassOf"),
+        ("Disease", "BioEntity", "subClassOf"),
+        ("Species", "BioEntity", "subClassOf"),
+        ("Mutation", "BioEntity", "subClassOf"),
+        ("ActiveAuthor", "Author", "subClassOf"),
+        ("AnonymousAuthor", "Author", "subClassOf"),
+        ("ProlificAuthor", "Author", "subClassOf"),
+        ("SingleAuthorArticle", "Article", "subClassOf"),
+        ("MultiAuthorArticle", "Article", "subClassOf"),
+    ]
+    
+    for source, target, label in relationships:
+        links.append({"source": source, "target": target, "label": label})
+    
+    return jsonify({"nodes": nodes, "links": links})
+
+
+from flask import render_template
 
 @app.route('/')
 def index():
-    return HTML_TEMPLATE
+    return render_template('index.html')
 
-@app.route('/api/stats')
-def api_stats():
-    return jsonify(get_ontology_stats())
-
-@app.route('/api/search/<entity_type>')
-def api_search(entity_type):
-    query = request.args.get('q', '')
-    return jsonify(search_entity(entity_type, query))
 
 if __name__ == '__main__':
     print("="*60)
-    print("PKG2020 Knowledge Graph Explorer")
+    print("PKG2020 Knowledge Graph Explorer - Professional Edition")
     print("="*60)
-    print("\n📊 Entity Types Available:")
-    print("  - Authors, Articles, Organizations")
-    print("  - Affiliations, Employment, Education")
-    print("  - BioEntities, NIH Projects, Institutions")
+    print("\n🧬 Features:")
+    print("  - Dashboard with animated statistics")
+    print("  - Full graph visualization (23 classes)")
+    print("  - SPARQL query editor with dropdown")
+    print("  - 10 competency queries")
+    print("  - Data provenance proof")
+    print("  - D3.js chart visualizations")
     print("\n🌐 Open http://localhost:5000 in your browser")
     print("\nPress Ctrl+C to stop\n")
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5000, host='0.0.0.0')

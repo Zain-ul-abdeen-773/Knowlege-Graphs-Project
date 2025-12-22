@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PKG2020 Knowledge Graph Explorer</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e94560;
+            --secondary: #0f3460;
+            --accent: #f39c12;
+            --bg-dark: #0a0a1a;
+            --bg-card: rgba(255,255,255,0.05);
+            --text: #ffffff;
+            --text-muted: #888;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Floating particles background */
+        .particles {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--secondary), var(--bg-dark));
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+        
+        .header-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+        
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: rgba(0,0,0,0.3);
+            overflow-x: auto;
+        }
+        
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--bg-card);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+        
+        .nav-tab:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(233,69,96,0.2);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-color: transparent;
+            box-shadow: 0 10px 30px rgba(233,69,96,0.3);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+        
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.15s; }
+        .stat-card:nth-child(3) { animation-delay: 0.2s; }
+        .stat-card:nth-child(4) { animation-delay: 0.25s; }
+        .stat-card:nth-child(5) { animation-delay: 0.3s; }
+        .stat-card:nth-child(6) { animation-delay: 0.35s; }
+        .stat-card:nth-child(7) { animation-delay: 0.4s; }
+        .stat-card:nth-child(8) { animation-delay: 0.45s; }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(233,69,96,0.15);
+        }
+        
+        .stat-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-card p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Panel */
+        .panel {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .panel-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Query Editor */
+        .query-editor {
+            width: 100%;
+            min-height: 200px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            color: var(--text);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+        }
+        
+        .query-editor:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(233,69,96,0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        /* Select Dropdown */
+        .select-wrapper {
+            position: relative;
+        }
+        
+        select {
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.4);
+            color: var(--text);
+            font-size: 0.9rem;
+            min-width: 250px;
+            cursor: pointer;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Results Table */
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .results-table th,
+        .results-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .results-table th {
+            background: rgba(233,69,96,0.2);
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .results-table tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        /* Graph Container */
+        #graph-container {
+            width: 100%;
+            height: 600px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        #graph-container svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Results Visualization */
+        .results-viz {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .chart-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 1rem;
+            min-height: 300px;
+        }
+        
+        /* Proof Section */
+        .proof-card {
+            background: linear-gradient(135deg, rgba(233,69,96,0.1), rgba(243,156,18,0.1));
+            border: 1px solid var(--primary);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .proof-card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .proof-list {
+            list-style: none;
+        }
+        
+        .proof-list li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .proof-list li::before {
+            content: "✓";
+            color: var(--accent);
+            font-weight: bold;
+        }
+        
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(233,69,96,0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .fab:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .results-viz {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <h1>🧬 PKG2020 Knowledge Graph Explorer</h1>
+        <p class="header-subtitle">Interactive SPARQL Query Interface | 23 Classes | 1.7M+ Triples</p>
+    </header>
+    
+    <!-- Navigation -->
+    <nav class="nav-tabs">
+        <button class="nav-tab active" onclick="showTab('dashboard')">📊 Dashboard</button>
+        <button class="nav-tab" onclick="showTab('graph')">🕸️ Full Graph (23 Classes)</button>
+        <button class="nav-tab" onclick="showTab('sparql')">💻 SPARQL Query</button>
+        <button class="nav-tab" onclick="showTab('competency')">📝 Competency Queries</button>
+        <button class="nav-tab" onclick="showTab('proof')">✅ Data Provenance</button>
+        <button class="nav-tab" onclick="showTab('api')">🔌 API Endpoints</button>
+    </nav>
+    
+    <div class="container">
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-card"><div class="spinner"></div></div>
+            </div>
+            
+            <div class="panel">
+                <h3 class="panel-title">📈 Knowledge Graph Overview</h3>
+                <div id="overview-chart" style="height: 400px;"></div>
+            </div>
+        </div>
+        
+        <!-- Full Graph Tab -->
+        <div id="graph" class="tab-content">
+            <div class="panel">
+                <h3 class="panel-title">🕸️ Complete Ontology Schema (All 23 Classes)</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                    Interactive force-directed graph showing all classes and relationships. Drag nodes to explore.
+                </p>
+                <div id="graph-container"></div>
+            </div>
+        </div>
+        
+        <!-- SPARQL Tab -->
+        <div id="sparql" class="tab-content">
+            <div class="panel">
+                <h3 class="panel-title">💻 SPARQL Query Editor</h3>
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                    <select id="query-select" onchange="loadSelectedQuery()">
+                        <option value="">Select a query...</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="executeQuery()">▶ Execute Query</button>
+                    <button class="btn btn-secondary" onclick="clearQuery()">Clear</button>
+                </div>
+                <textarea id="query-editor" class="query-editor" placeholder="Enter SPARQL query..."></textarea>
+            </div>
+            
+            <div class="panel">
+                <h3 class="panel-title">📊 Query Results</h3>
+                <div id="query-results">
+                    <p style="color: var(--text-muted); text-align: center;">Execute a query to see results</p>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3 class="panel-title">📈 Results Visualization</h3>
+                <div id="results-chart" style="height: 400px;"></div>
+            </div>
+        </div>
+        
+        <!-- Competency Queries Tab -->
+        <div id="competency" class="tab-content">
+            <div class="panel">
+                <h3 class="panel-title">📝 Competency Questions (10 Queries)</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                    Click on any question to execute the corresponding SPARQL query.
+                </p>
+                <div id="competency-list"></div>
+            </div>
+        </div>
+        
+        <!-- Data Provenance Tab -->
+        <div id="proof" class="tab-content">
+            <div class="proof-card">
+                <h3>📜 Proof: Data Not Previously Available as Linked Data</h3>
+                <ul class="proof-list">
+                    <li>Original data sourced from PKG2020S4 CSV files (raw tabular format)</li>
+                    <li>No prior RDF/OWL/Linked Data publication exists for this dataset</li>
+                    <li>Data converted to RDF using OWLReady2 Python library</li>
+                    <li>Custom ontology designed with 23 classes</li>
+                    <li>Linked to external datasets: DBpedia, Wikidata</li>
+                    <li>SPARQL endpoint published for the first time</li>
+                </ul>
+            </div>
+            
+            <div class="panel">
+                <h3 class="panel-title">📂 Original Data Sources (CSV)</h3>
+                <table class="results-table">
+                    <tr><th>File</th><th>Description</th><th>Original Format</th></tr>
+                    <tr><td>OA01_Author_List.csv</td><td>Author-Article relationships</td><td>CSV (10+ GB)</td></tr>
+                    <tr><td>OA04_Affiliations.csv</td><td>Author affiliations</td><td>CSV (20+ GB)</td></tr>
+                    <tr><td>OA05_Researcher_Employment.csv</td><td>Employment history</td><td>CSV</td></tr>
+                    <tr><td>OA06_Researcher_Education.csv</td><td>Education records</td><td>CSV</td></tr>
+                    <tr><td>OA02_Bio_entities_Main.csv</td><td>Biological entities</td><td>CSV</td></tr>
+                    <tr><td>OA03_Bio_entities_Mutation.csv</td><td>Mutations in articles</td><td>CSV</td></tr>
+                    <tr><td>OA07_NIH_Projects.csv</td><td>NIH funding</td><td>CSV</td></tr>
+                </table>
+            </div>
+            
+            <div class="panel">
+                <h3 class="panel-title">🔗 External Linking (5-Star Linked Data)</h3>
+                <table class="results-table">
+                    <tr><th>Entity Type</th><th>Linked To</th><th>Property Used</th></tr>
+                    <tr><td>Organizations</td><td>DBpedia</td><td>owl:sameAs, dbpediaLink</td></tr>
+                    <tr><td>Institutions</td><td>Wikidata</td><td>wikidataLink</td></tr>
+                    <tr><td>Articles</td><td>PubMed</td><td>hasPMID (URI reference)</td></tr>
+                    <tr><td>Authors</td><td>ORCID (potential)</td><td>hasORCID</td></tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- API Tab -->
+        <div id="api" class="tab-content">
+            <div class="panel">
+                <h3 class="panel-title">🔌 API Endpoints</h3>
+                <table class="results-table">
+                    <tr><th>Endpoint</th><th>Method</th><th>Description</th></tr>
+                    <tr><td>/api/stats</td><td>GET</td><td>Get knowledge graph statistics</td></tr>
+                    <tr><td>/api/query</td><td>POST</td><td>Execute SPARQL query</td></tr>
+                    <tr><td>/api/competency-queries</td><td>GET</td><td>Get all competency queries</td></tr>
+                    <tr><td>/api/classes</td><td>GET</td><td>Get all 23 ontology classes</td></tr>
+                    <tr><td>/api/graph-data</td><td>GET</td><td>Get D3.js graph data</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating Action Button -->
+    <button class="fab" onclick="scrollToTop()">↑</button>
+    
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+        
+        // Tab switching
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabId === 'graph') loadFullGraph();
+            if (tabId === 'sparql') loadQueryDropdown();
+            if (tabId === 'competency') loadCompetencyList();
+        }
+        
+        // Load stats
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                
+                const grid = document.getElementById('stats-grid');
+                const entities = [
+                    ['Authors', data.individuals?.Author || 0, '👤'],
+                    ['Articles', data.individuals?.Article || 0, '📄'],
+                    ['Organizations', data.individuals?.Organization || 0, '🏢'],
+                    ['Affiliations', data.individuals?.Affiliation || 0, '📍'],
+                    ['BioEntities', data.individuals?.BioEntity || 0, '🧬'],
+                    ['Genes', data.individuals?.Gene || 0, '🧪'],
+                    ['Mutations', data.individuals?.Mutation || 0, '🔬'],
+                    ['NIH Projects', data.individuals?.NIHProject || 0, '💰']
+                ];
+                
+                grid.innerHTML = entities.map(([name, count, icon]) => `
+                    <div class="stat-card">
+                        <h3>${count.toLocaleString()}</h3>
+                        <p>${icon} ${name}</p>
+                    </div>
+                `).join('');
+                
+                // Create overview chart
+                createOverviewChart(entities);
+            } catch (e) {
+                console.error('Error loading stats:', e);
+            }
+        }
+        
+        // D3.js Overview Chart
+        function createOverviewChart(entities) {
+            const container = document.getElementById('overview-chart');
+            container.innerHTML = '';
+            
+            const width = container.clientWidth;
+            const height = 400;
+            const margin = {top: 20, right: 30, bottom: 60, left: 80};
+            
+            const svg = d3.select('#overview-chart')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            const x = d3.scaleBand()
+                .domain(entities.map(d => d[0]))
+                .range([margin.left, width - margin.right])
+                .padding(0.3);
+            
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(entities, d => d[1])])
+                .nice()
+                .range([height - margin.bottom, margin.top]);
+            
+            // Gradient
+            const gradient = svg.append('defs')
+                .append('linearGradient')
+                .attr('id', 'barGradient')
+                .attr('x1', '0%').attr('y1', '0%')
+                .attr('x2', '0%').attr('y2', '100%');
+            gradient.append('stop').attr('offset', '0%').attr('stop-color', '#e94560');
+            gradient.append('stop').attr('offset', '100%').attr('stop-color', '#f39c12');
+            
+            // Bars with animation
+            svg.selectAll('rect')
+                .data(entities)
+                .enter()
+                .append('rect')
+                .attr('x', d => x(d[0]))
+                .attr('y', height - margin.bottom)
+                .attr('width', x.bandwidth())
+                .attr('height', 0)
+                .attr('fill', 'url(#barGradient)')
+                .attr('rx', 8)
+                .transition()
+                .duration(800)
+                .delay((d, i) => i * 100)
+                .attr('y', d => y(d[1]))
+                .attr('height', d => height - margin.bottom - y(d[1]));
+            
+            // X Axis
+            svg.append('g')
+                .attr('transform', `translate(0,${height - margin.bottom})`)
+                .call(d3.axisBottom(x))
+                .selectAll('text')
+                .attr('fill', '#888')
+                .attr('transform', 'rotate(-45)')
+                .style('text-anchor', 'end');
+            
+            // Y Axis
+            svg.append('g')
+                .attr('transform', `translate(${margin.left},0)`)
+                .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('.2s')))
+                .selectAll('text')
+                .attr('fill', '#888');
+        }
+        
+        // Load full graph with all 23 classes
+        async function loadFullGraph() {
+            try {
+                const res = await fetch('/api/graph-data');
+                const data = await res.json();
+                
+                const container = document.getElementById('graph-container');
+                container.innerHTML = '';
+                
+                const width = container.clientWidth;
+                const height = 600;
+                
+                const svg = d3.select('#graph-container')
+                    .append('svg')
+                    .attr('width', width)
+                    .attr('height', height);
+                
+                // Force simulation
+                const simulation = d3.forceSimulation(data.nodes)
+                    .force('link', d3.forceLink(data.links).id(d => d.id).distance(100))
+                    .force('charge', d3.forceManyBody().strength(-300))
+                    .force('center', d3.forceCenter(width / 2, height / 2));
+                
+                // Links
+                const link = svg.append('g')
+                    .selectAll('line')
+                    .data(data.links)
+                    .enter()
+                    .append('line')
+                    .attr('stroke', '#444')
+                    .attr('stroke-width', 2);
+                
+                // Nodes
+                const node = svg.append('g')
+                    .selectAll('circle')
+                    .data(data.nodes)
+                    .enter()
+                    .append('circle')
+                    .attr('r', d => d.size)
+                    .attr('fill', d => d.color)
+                    .attr('stroke', '#fff')
+                    .attr('stroke-width', 2)
+                    .call(d3.drag()
+                        .on('start', dragstarted)
+                        .on('drag', dragged)
+                        .on('end', dragended));
+                
+                // Labels
+                const labels = svg.append('g')
+                    .selectAll('text')
+                    .data(data.nodes)
+                    .enter()
+                    .append('text')
+                    .text(d => d.id)
+                    .attr('fill', '#fff')
+                    .attr('font-size', '10px')
+                    .attr('dx', 15)
+                    .attr('dy', 4);
+                
+                simulation.on('tick', () => {
+                    link
+                        .attr('x1', d => d.source.x)
+                        .attr('y1', d => d.source.y)
+                        .attr('x2', d => d.target.x)
+                        .attr('y2', d => d.target.y);
+                    
+                    node
+                        .attr('cx', d => d.x)
+                        .attr('cy', d => d.y);
+                    
+                    labels
+                        .attr('x', d => d.x)
+                        .attr('y', d => d.y);
+                });
+                
+                function dragstarted(event) {
+                    if (!event.active) simulation.alphaTarget(0.3).restart();
+                    event.subject.fx = event.subject.x;
+                    event.subject.fy = event.subject.y;
+                }
+                
+                function dragged(event) {
+                    event.subject.fx = event.x;
+                    event.subject.fy = event.y;
+                }
+                
+                function dragended(event) {
+                    if (!event.active) simulation.alphaTarget(0);
+                    event.subject.fx = null;
+                    event.subject.fy = null;
+                }
+            } catch (e) {
+                console.error('Error loading graph:', e);
+            }
+        }
+        
+        // Load query dropdown
+        async function loadQueryDropdown() {
+            try {
+                const res = await fetch('/api/competency-queries');
+                const queries = await res.json();
+                
+                const select = document.getElementById('query-select');
+                select.innerHTML = '<option value="">Select a query...</option>';
+                
+                for (const [key, q] of Object.entries(queries)) {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = q.title;
+                    select.appendChild(option);
+                }
+            } catch (e) {
+                console.error('Error loading queries:', e);
+            }
+        }
+        
+        async function loadSelectedQuery() {
+            const select = document.getElementById('query-select');
+            const key = select.value;
+            if (!key) return;
+            
+            const res = await fetch('/api/competency-queries');
+            const queries = await res.json();
+            
+            document.getElementById('query-editor').value = queries[key].query;
+        }
+        
+        // Execute query
+        async function executeQuery() {
+            const query = document.getElementById('query-editor').value;
+            if (!query.trim()) return;
+            
+            const resultsDiv = document.getElementById('query-results');
+            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            
+            try {
+                const res = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({query})
+                });
+                
+                const data = await res.json();
+                
+                if (data.error) {
+                    resultsDiv.innerHTML = `<p style="color: #e94560;">Error: ${data.error}</p>`;
+                    return;
+                }
+                
+                if (data.rows.length === 0) {
+                    resultsDiv.innerHTML = '<p style="color: var(--text-muted);">No results found</p>';
+                    return;
+                }
+                
+                // Build table
+                let html = `<p style="margin-bottom: 1rem; color: var(--text-muted);">${data.count} results</p>`;
+                html += '<div style="overflow-x: auto;"><table class="results-table"><tr>';
+                data.columns.forEach(col => html += `<th>${col}</th>`);
+                html += '</tr>';
+                
+                data.rows.slice(0, 50).forEach(row => {
+                    html += '<tr>';
+                    row.forEach(cell => html += `<td>${cell}</td>`);
+                    html += '</tr>';
+                });
+                html += '</table></div>';
+                
+                resultsDiv.innerHTML = html;
+                
+                // Create results chart
+                createResultsChart(data);
+            } catch (e) {
+                resultsDiv.innerHTML = `<p style="color: #e94560;">Error: ${e.message}</p>`;
+            }
+        }
+        
+        function createResultsChart(data) {
+            const container = document.getElementById('results-chart');
+            container.innerHTML = '';
+            
+            if (data.rows.length === 0) return;
+            
+            // Simple bar chart of first numeric column
+            const numericColIndex = data.columns.findIndex((col, i) => 
+                !isNaN(parseFloat(data.rows[0][i]))
+            );
+            
+            if (numericColIndex === -1) {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No numeric data to visualize</p>';
+                return;
+            }
+            
+            const chartData = data.rows.slice(0, 10).map((row, i) => ({
+                label: row[0] || `Item ${i}`,
+                value: parseFloat(row[numericColIndex]) || 0
+            }));
+            
+            const width = container.clientWidth;
+            const height = 400;
+            const margin = {top: 20, right: 30, bottom: 100, left: 80};
+            
+            const svg = d3.select('#results-chart')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            const x = d3.scaleBand()
+                .domain(chartData.map(d => d.label.substring(d.label.lastIndexOf('/') + 1).substring(0, 20)))
+                .range([margin.left, width - margin.right])
+                .padding(0.3);
+            
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(chartData, d => d.value)])
+                .nice()
+                .range([height - margin.bottom, margin.top]);
+            
+            svg.selectAll('rect')
+                .data(chartData)
+                .enter()
+                .append('rect')
+                .attr('x', d => x(d.label.substring(d.label.lastIndexOf('/') + 1).substring(0, 20)))
+                .attr('y', height - margin.bottom)
+                .attr('width', x.bandwidth())
+                .attr('height', 0)
+                .attr('fill', '#e94560')
+                .attr('rx', 5)
+                .transition()
+                .duration(500)
+                .attr('y', d => y(d.value))
+                .attr('height', d => height - margin.bottom - y(d.value));
+            
+            svg.append('g')
+                .attr('transform', `translate(0,${height - margin.bottom})`)
+                .call(d3.axisBottom(x))
+                .selectAll('text')
+                .attr('fill', '#888')
+                .attr('transform', 'rotate(-45)')
+                .style('text-anchor', 'end');
+            
+            svg.append('g')
+                .attr('transform', `translate(${margin.left},0)`)
+                .call(d3.axisLeft(y))
+                .selectAll('text')
+                .attr('fill', '#888');
+        }
+        
+        function clearQuery() {
+            document.getElementById('query-editor').value = '';
+            document.getElementById('query-results').innerHTML = '<p style="color: var(--text-muted); text-align: center;">Execute a query to see results</p>';
+        }
+        
+        // Load competency list
+        async function loadCompetencyList() {
+            try {
+                const res = await fetch('/api/competency-queries');
+                const queries = await res.json();
+                
+                const list = document.getElementById('competency-list');
+                list.innerHTML = '';
+                
+                for (const [key, q] of Object.entries(queries)) {
+                    const card = document.createElement('div');
+                    card.className = 'panel';
+                    card.style.cursor = 'pointer';
+                    card.innerHTML = `
+                        <h4 style="color: var(--primary);">${q.title}</h4>
+                        <p style="color: var(--text-muted); margin: 0.5rem 0;">${q.description}</p>
+                        <button class="btn btn-primary" onclick="runCompetencyQuery('${key}')">▶ Execute</button>
+                    `;
+                    list.appendChild(card);
+                }
+            } catch (e) {
+                console.error('Error loading competency queries:', e);
+            }
+        }
+        
+        async function runCompetencyQuery(key) {
+            const res = await fetch('/api/competency-queries');
+            const queries = await res.json();
+            
+            document.getElementById('query-editor').value = queries[key].query;
+            showTab('sparql');
+            document.querySelectorAll('.nav-tab')[2].classList.add('active');
+            executeQuery();
+        }
+        
+        function scrollToTop() {
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+        
+        // Initialize
+        loadStats();
+        loadQueryDropdown();
+    </script>
+</body>
+</html>
