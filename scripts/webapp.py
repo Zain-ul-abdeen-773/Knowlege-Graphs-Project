@@ -256,6 +256,10 @@ def run_query():
         data = request.get_json()
         query = data.get('query', '')
         
+        # If graph is empty (no data files), return sample results
+        if len(graph) == 0:
+            return jsonify(get_sample_results(query))
+        
         results = graph.query(query)
         
         # Convert to JSON-serializable format
@@ -267,6 +271,101 @@ def run_query():
         return jsonify({"columns": columns, "rows": rows, "count": len(rows)})
     except Exception as e:
         return jsonify({"error": str(e), "columns": [], "rows": []})
+
+
+def get_sample_results(query):
+    """Return sample results for demo when data files not available"""
+    query_lower = query.lower()
+    
+    # Sample data for different query types
+    if "author" in query_lower and "count" in query_lower:
+        return {
+            "columns": ["author", "articleCount"],
+            "rows": [
+                ["Author_1644707", "27"], ["Author_2854891", "23"], ["Author_9182736", "21"],
+                ["Author_3847562", "19"], ["Author_7263849", "18"], ["Author_5928374", "16"],
+                ["Author_8374652", "15"], ["Author_4729183", "14"], ["Author_6182947", "13"],
+                ["Author_9384756", "12"]
+            ],
+            "count": 10,
+            "note": "Sample data - deploy with full dataset for live queries"
+        }
+    elif "gene" in query_lower or "bioentity" in query_lower:
+        return {
+            "columns": ["article", "pmid", "gene", "geneName"],
+            "rows": [
+                ["Article_30294851", "30294851", "Gene_BRCA1", "BRCA1"],
+                ["Article_30294852", "30294852", "Gene_TP53", "TP53"],
+                ["Article_30294853", "30294853", "Gene_EGFR", "EGFR"],
+                ["Article_30294854", "30294854", "Gene_KRAS", "KRAS"],
+                ["Article_30294855", "30294855", "Gene_PIK3CA", "PIK3CA"]
+            ],
+            "count": 5,
+            "note": "Sample data - deploy with full dataset for live queries"
+        }
+    elif "organization" in query_lower or "affiliation" in query_lower:
+        return {
+            "columns": ["org", "authorCount"],
+            "rows": [
+                ["Harvard_University", "2847"], ["Stanford_University", "2156"],
+                ["MIT", "1893"], ["Johns_Hopkins_University", "1654"],
+                ["Yale_University", "1432"], ["Columbia_University", "1298"],
+                ["University_of_Pennsylvania", "1187"], ["Duke_University", "1056"],
+                ["UCLA", "987"], ["UCSF", "876"]
+            ],
+            "count": 10,
+            "note": "Sample data - deploy with full dataset for live queries"
+        }
+    elif "collaboration" in query_lower or "author1" in query_lower:
+        return {
+            "columns": ["author1", "author2", "collaborations"],
+            "rows": [
+                ["Author_1234567", "Author_7654321", "15"],
+                ["Author_2345678", "Author_8765432", "12"],
+                ["Author_3456789", "Author_9876543", "10"],
+                ["Author_4567890", "Author_0987654", "8"],
+                ["Author_5678901", "Author_1098765", "7"]
+            ],
+            "count": 5,
+            "note": "Sample data - deploy with full dataset for live queries"
+        }
+    elif "nihproject" in query_lower or "project" in query_lower:
+        return {
+            "columns": ["author", "project", "projectNumber"],
+            "rows": [
+                ["Author_1644707", "NIHProject_R01CA123456", "R01CA123456"],
+                ["Author_2854891", "NIHProject_R01GM789012", "R01GM789012"],
+                ["Author_9182736", "NIHProject_P01AI345678", "P01AI345678"],
+                ["Author_3847562", "NIHProject_U01CA901234", "U01CA901234"],
+                ["Author_7263849", "NIHProject_R21NS567890", "R21NS567890"]
+            ],
+            "count": 5,
+            "note": "Sample data - deploy with full dataset for live queries"
+        }
+    elif "class" in query_lower:
+        return {
+            "columns": ["class", "label"],
+            "rows": [[cls, cls] for cls in ALL_CLASSES],
+            "count": 23,
+            "note": "All 23 classes in the ontology"
+        }
+    else:
+        return {
+            "columns": ["subject", "predicate", "object"],
+            "rows": [
+                ["Article_30294851", "writtenBy", "Author_1644707"],
+                ["Article_30294851", "hasPMID", "30294851"],
+                ["Author_1644707", "hasAffiliation", "Affiliation_1"],
+                ["Affiliation_1", "affiliatedWith", "Harvard_University"],
+                ["Author_1644707", "hasEmployment", "Employment_1"],
+                ["Gene_BRCA1", "entityName", "BRCA1"],
+                ["Article_30294851", "mentionsBioEntity", "Gene_BRCA1"],
+                ["Author_1644707", "hasProject", "NIHProject_R01CA123456"]
+            ],
+            "count": 8,
+            "note": "Sample data - deploy with full dataset for live queries"
+        }
+
 
 @app.route('/api/competency-queries')
 def get_competency_queries():
