@@ -2,7 +2,7 @@
 PKG2020 Knowledge Graph - Professional Web Application
 Modern UI with D3.js graphs, animations, and SPARQL query visualization
 """
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, render_template
 from flask_cors import CORS
 from rdflib import Graph, Namespace, URIRef
 import json
@@ -15,18 +15,74 @@ CORS(app)
 TTL_PATH = "../owl/pkg2020_final.ttl"
 OWL_PATH = "../owl/pkg2020_final.owl"
 
-# Initialize RDF Graph
+# All 23 Classes (moved up for preloading)
+ALL_CLASSES = [
+    "Article", "Author", "Authorship", "PublicationYear", "PublicationStatus",
+    "Organization", "Institution", "Affiliation", "Employment", "Education",
+    "NIHProject", "BioEntity", "Gene", "Chemical", "Disease", "Species", "Mutation",
+    "ActiveAuthor", "AnonymousAuthor", "ResearchEntity", 
+    "ProlificAuthor", "SingleAuthorArticle", "MultiAuthorArticle"
+]
+
+# Global RDF Graph - loaded at startup
 g = None
+STATS_CACHE = None
 
 def load_graph():
     global g
     if g is None:
+        print("\n" + "="*60)
+        print("📂 Loading RDF graph (please wait)...")
+        print("="*60)
         g = Graph()
         if os.path.exists(TTL_PATH):
+            print(f"   Loading from: {TTL_PATH}")
             g.parse(TTL_PATH, format="turtle")
+            print(f"   ✅ Loaded {len(g):,} triples from TTL")
         elif os.path.exists(OWL_PATH):
+            print(f"   Loading from: {OWL_PATH}")
             g.parse(OWL_PATH, format="xml")
+            print(f"   ✅ Loaded {len(g):,} triples from OWL")
+        else:
+            print("   ⚠️ WARNING: No ontology file found!")
+        print("="*60 + "\n")
     return g
+
+def compute_stats():
+    global STATS_CACHE
+    if STATS_CACHE is None:
+        print("📊 Computing statistics from complete data...")
+        graph = load_graph()
+        
+        STATS_CACHE = {
+            "classes": 23,
+            "triples": len(graph),
+            "individuals": {}
+        }
+        
+        for cls in ALL_CLASSES:
+            query = f"""
+            PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+            SELECT (COUNT(?s) AS ?count) WHERE {{ ?s a pkg:{cls} }}
+            """
+            try:
+                result = list(graph.query(query))
+                if result:
+                    count = int(result[0][0])
+                    STATS_CACHE["individuals"][cls] = count
+                    print(f"   {cls}: {count:,}")
+            except Exception as e:
+                STATS_CACHE["individuals"][cls] = 0
+        
+        print("✅ Stats computation complete!\n")
+    return STATS_CACHE
+
+
+# Preload graph and compute stats at startup
+print("\n🚀 Initializing PKG2020 Knowledge Graph Explorer...")
+load_graph()
+compute_stats()
+print("🎉 Ready to serve requests!\n")
 
 # Competency Questions with SPARQL Queries
 COMPETENCY_QUERIES = {
@@ -165,38 +221,10 @@ LIMIT 100"""
     }
 }
 
-# All 23 Classes
-ALL_CLASSES = [
-    "Article", "Author", "Authorship", "PublicationYear", "PublicationStatus",
-    "Organization", "Institution", "Affiliation", "Employment", "Education",
-    "NIHProject", "BioEntity", "Gene", "Chemical", "Disease", "Species", "Mutation",
-    "ActiveAuthor", "AnonymousAuthor", "ResearchEntity", 
-    "ProlificAuthor", "SingleAuthorArticle", "MultiAuthorArticle"
-]
-
 @app.route('/api/stats')
 def get_stats():
-    try:
-        graph = load_graph()
-        pkg = Namespace("http://example.org/pkg2020/ontology.owl#")
-        
-        stats = {"classes": 23, "triples": len(graph), "individuals": {}}
-        
-        for cls in ALL_CLASSES:
-            query = f"""
-            PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
-            SELECT (COUNT(?s) AS ?count) WHERE {{ ?s a pkg:{cls} }}
-            """
-            try:
-                result = list(graph.query(query))
-                if result:
-                    stats["individuals"][cls] = int(result[0][0])
-            except:
-                stats["individuals"][cls] = 0
-        
-        return jsonify(stats)
-    except Exception as e:
-        return jsonify({"error": str(e), "classes": 23, "triples": 0, "individuals": {}})
+    # Return precomputed stats from complete data
+    return jsonify(STATS_CACHE)
 
 @app.route('/api/query', methods=['POST'])
 def run_query():
