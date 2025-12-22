@@ -11,9 +11,10 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# Configuration
-TTL_PATH = "../owl/pkg2020_final.ttl"
-OWL_PATH = "../owl/pkg2020_final.owl"
+# Configuration - paths relative to this script file
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+TTL_PATH = os.path.join(SCRIPT_DIR, "..", "owl", "pkg2020_final.ttl")
+OWL_PATH = os.path.join(SCRIPT_DIR, "..", "owl", "pkg2020_final.owl")
 
 # All 23 Classes (moved up for preloading)
 ALL_CLASSES = [
