@@ -1,5 +1,4 @@
 # PKG2020 Knowledge Graph Data
-data/
 
 # Python cache
 __pycache__/
@@ -20,6 +19,6 @@ venv/
 Thumbs.db
 
 # Large files
-*.csv
+
 *.gz
 *.zip

@@ -1,6 +1,11 @@
 import pandas as pd
 import re
+import os
 from owlready2 import *
+
+# Get script directory for relative paths
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
 
 def sanitize_iri(name):
     """Sanitize string for use as OWL IRI"""
@@ -9,7 +14,7 @@ def sanitize_iri(name):
     name = name.strip('_')
     return name if name else "Unknown"
 
-onto = get_ontology("pkg2020_populated_authors.owl").load()
+onto = get_ontology(os.path.join(PROJECT_DIR, "owl", "pkg2020_populated_authors.owl")).load()
 
 # Define new classes and properties for affiliations
 with onto:
@@ -47,7 +52,8 @@ Organization = onto.Organization
 author_cache = {a.name: a for a in Author.instances()}
 org_cache = {}
 
-df = pd.read_csv("data/OA04_Affiliations.csv", nrows=5000)
+# Process all 50000 rows
+df = pd.read_csv(os.path.join(PROJECT_DIR, "data", "OA04_Affiliations.csv"), nrows=50000)
 print("CSV Columns:", df.columns.tolist())
 print(f"Loaded {len(author_cache)} authors from ontology")
 
@@ -83,5 +89,5 @@ with onto:
         aff.affiliatedWith.append(org_cache[org_name])
 
 print(f"Created {len(list(Affiliation.instances()))} affiliations")
-onto.save(file="pkg2020_step4_affiliations_populated.owl", format="rdfxml")
+onto.save(file=os.path.join(PROJECT_DIR, "owl", "pkg2020_step4_affiliations_populated.owl"), format="rdfxml")
 print("Saved: pkg2020_step4_affiliations_populated.owl")

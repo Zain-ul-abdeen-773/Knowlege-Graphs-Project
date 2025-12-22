@@ -1,9 +1,14 @@
 import pandas as pd
 from owlready2 import *
 import gc
+import os
+
+# Get script directory for relative paths
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
 
 # Load ontology
-onto = get_ontology("pkg2020_constrained.owl").load()
+onto = get_ontology(os.path.join(PROJECT_DIR, "owl", "pkg2020_constrained.owl")).load()
 
 Article = onto.Article
 Author = onto.Author
@@ -17,11 +22,11 @@ foreName = onto.foreName
 initials = onto.initials
 authorOrder = onto.authorOrder
 
-# Reduced to 5000 rows for memory safety
-NROWS = 5000
+# Process all 50000 rows
+NROWS = 50000
 
 # Load CSV with specific columns only to save memory
-df = pd.read_csv("data/OA01_Author_List.csv", 
+df = pd.read_csv(os.path.join(PROJECT_DIR, "data", "OA01_Author_List.csv"), 
                  nrows=NROWS,
                  usecols=["PMID", "AND_ID", "LastName", "ForeName", "Initials", "AuOrder"])
 print(f"Loaded {len(df)} rows from CSV")
@@ -42,7 +47,7 @@ with onto:
         article_iri = f"Article_{pmid}"
         if article_iri not in article_cache:
             article = Article(article_iri)
-            article.hasPMID = [pmid]
+            article.hasPMID = pmid  # FunctionalProperty - single value
             article_cache.add(article_iri)
         else:
             article = onto[article_iri]
@@ -51,16 +56,20 @@ with onto:
         author_iri = f"Author_{and_id}"
         if author_iri not in author_cache:
             author = Author(author_iri)
-            author.lastName = [str(row["LastName"])]
-            author.foreName = [str(row["ForeName"])]
-            author.initials = [str(row["Initials"])]
+            if pd.notna(row["LastName"]):
+                author.lastName = [str(row["LastName"])]
+            if pd.notna(row["ForeName"]):
+                author.foreName = [str(row["ForeName"])]
+            if pd.notna(row["Initials"]):
+                author.initials = [str(row["Initials"])]
             author_cache.add(author_iri)
         else:
             author = onto[author_iri]
 
         # ----- Authorship (reified relation) -----
         auth = Authorship(f"Authorship_{pmid}_{and_id}")
-        auth.authorOrder = [int(row["AuOrder"])]
+        if pd.notna(row["AuOrder"]):
+            auth.authorOrder = [int(row["AuOrder"])]  # Non-functional - needs list
 
         # ----- Link everything -----
         article.writtenBy.append(author)
@@ -74,5 +83,5 @@ gc.collect()
 print(f"Created {len(article_cache)} articles, {len(author_cache)} authors")
 
 # Save populated ontology
-onto.save(file="pkg2020_populated_authors.owl", format="rdfxml")
+onto.save(file=os.path.join(PROJECT_DIR, "owl", "pkg2020_populated_authors.owl"), format="rdfxml")
 print("Saved: pkg2020_populated_authors.owl")

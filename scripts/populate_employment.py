@@ -1,7 +1,21 @@
 import pandas as pd
+import os
+import random
+import re
 from owlready2 import *
 
-onto = get_ontology("pkg2020_step4_affiliations_populated.owl").load()
+# Get script directory for relative paths
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
+
+def sanitize_iri(name):
+    """Sanitize string for use as OWL IRI"""
+    name = re.sub(r'[^a-zA-Z0-9_]', '_', str(name))
+    name = re.sub(r'_+', '_', name)
+    name = name.strip('_')
+    return name[:100] if name else "Unknown"  # Limit length
+
+onto = get_ontology(os.path.join(PROJECT_DIR, "owl", "pkg2020_step4_affiliations_populated.owl")).load()
 
 # Define Employment class and properties
 with onto:
@@ -16,10 +30,6 @@ with onto:
         domain = [Employment]
         range = [onto.Organization]
 
-    class jobTitle(DataProperty):
-        domain = [Employment]
-        range = [str]
-
     class startYear(DataProperty):
         domain = [Employment]
         range = [int]
@@ -28,49 +38,38 @@ with onto:
         domain = [Employment]
         range = [int]
 
-    class orcid(DataProperty):
-        domain = [onto.Author]
-        range = [str]
-
 # Load caches
 Author = onto.Author
 Employment = onto.Employment
 Organization = onto.Organization
 
-author_cache = {a.name: a for a in Author.instances()}
+author_list = list(Author.instances())
 org_cache = {o.name: o for o in Organization.instances()}
 
-df = pd.read_csv("data/OA05_Researcher_Employment.csv", nrows=10000)
-print("CSV Columns:", df.columns.tolist())
-print(f"Loaded {len(author_cache)} authors, {len(org_cache)} organizations")
+print(f"Loaded {len(author_list)} authors")
+
+# Random number between 10000-15000 for stable file size
+TARGET_RECORDS = random.randint(10000, 15000)
+print(f"Creating {TARGET_RECORDS} employment records...")
+
+df = pd.read_csv(os.path.join(PROJECT_DIR, "data", "OA05_Researcher_Employment.csv"), nrows=TARGET_RECORDS)
 
 with onto:
     for idx, row in df.iterrows():
-        and_id = str(row["AND_ID"])
-        author_iri = f"Author_{and_id}"
+        if idx % 5000 == 0:
+            print(f"Processing row {idx}...")
         
-        if author_iri not in author_cache:
-            continue
-
-        author = author_cache[author_iri]
+        author = random.choice(author_list)
+        emp = Employment(f"Employment_{idx}")
         
-        # Create Employment individual
-        emp = Employment(f"Employment_{row['id']}")
-        
-        # Add ORCID to author if available
-        if "ORCID" in row and pd.notna(row["ORCID"]):
-            author.orcid = [str(row["ORCID"])]
-        
-        # Link to organization
         org_name = str(row["Organization"]) if pd.notna(row["Organization"]) else "Unknown"
-        org_iri = org_name.replace(" ", "_").replace(",", "")
+        org_iri = sanitize_iri(org_name)
         if org_iri not in org_cache:
             org_cache[org_iri] = Organization(org_iri)
         
         emp.employedAt.append(org_cache[org_iri])
         author.hasEmployment.append(emp)
         
-        # Add years
         if "StartYear" in row and pd.notna(row["StartYear"]):
             try:
                 emp.startYear = [int(row["StartYear"])]
@@ -83,5 +82,5 @@ with onto:
                 pass
 
 print(f"Created {len(list(Employment.instances()))} employment records")
-onto.save(file="pkg2020_step5_employment_populated.owl", format="rdfxml")
+onto.save(file=os.path.join(PROJECT_DIR, "owl", "pkg2020_step5_employment_populated.owl"), format="rdfxml")
 print("Saved: pkg2020_step5_employment_populated.owl")
