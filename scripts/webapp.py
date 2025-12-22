@@ -13,6 +13,8 @@ CORS(app)
 
 # Configuration - paths relative to this script file
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+# Use sample TTL (small file, works on Heroku) - falls back to full if available
+SAMPLE_TTL_PATH = os.path.join(SCRIPT_DIR, "..", "owl", "pkg2020_sample.ttl")
 TTL_PATH = os.path.join(SCRIPT_DIR, "..", "owl", "pkg2020_final.ttl")
 OWL_PATH = os.path.join(SCRIPT_DIR, "..", "owl", "pkg2020_final.owl")
 
@@ -52,7 +54,12 @@ def load_graph():
         print("\n" + "="*60)
         print("📂 Loading RDF graph...")
         print("="*60)
-        if os.path.exists(TTL_PATH):
+        # Try sample TTL first (small file for Heroku), then full files
+        if os.path.exists(SAMPLE_TTL_PATH):
+            print(f"   Loading from: {SAMPLE_TTL_PATH}")
+            g.parse(SAMPLE_TTL_PATH, format="turtle")
+            print(f"   ✅ Loaded {len(g):,} triples from sample TTL")
+        elif os.path.exists(TTL_PATH):
             print(f"   Loading from: {TTL_PATH}")
             g.parse(TTL_PATH, format="turtle")
             print(f"   ✅ Loaded {len(g):,} triples from TTL")
@@ -61,8 +68,7 @@ def load_graph():
             g.parse(OWL_PATH, format="xml")
             print(f"   ✅ Loaded {len(g):,} triples from OWL")
         else:
-            print("   ⚠️ Data files not found - using cached stats")
-            print("   (Upload owl/pkg2020_final.ttl for live queries)")
+            print("   ⚠️ No data files found")
         print("="*60 + "\n")
     return g
 
