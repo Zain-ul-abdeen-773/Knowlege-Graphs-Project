@@ -46,6 +46,7 @@
 \contentsline {subsection}{\numberline {12.3}Ontology Files Summary}{15}{subsection.12.3}%
 \contentsline {section}{\numberline {13}Visualization}{15}{section.13}%
 <<<<<<< HEAD
+<<<<<<< HEAD
 \contentsline {subsection}{\numberline {13.1}Tools Used}{15}{subsection.13.1}%
 \contentsline {subsection}{\numberline {13.2}Visualization Guide}{15}{subsection.13.2}%
 \contentsline {subsection}{\numberline {13.3}GraphDB Setup and SPARQL Queries}{15}{subsection.13.3}%
@@ -59,6 +60,8 @@
 \contentsline {section}{\numberline {17}Appendix: Project Repository}{17}{section.17}%
 \contentsline {subsection}{\numberline {17.1}Repository Structure}{17}{subsection.17.1}%
 =======
+=======
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
 \contentsline {subsection}{\numberline {13.1}Ontology Class Hierarchy}{15}{subsection.13.1}%
 \contentsline {subsection}{\numberline {13.2}Knowledge Graph Statistics}{16}{subsection.13.2}%
 \contentsline {subsection}{\numberline {13.3}Tools Used}{16}{subsection.13.3}%
@@ -72,4 +75,7 @@
 \contentsline {section}{\numberline {16}References}{18}{section.16}%
 \contentsline {section}{\numberline {17}Appendix: Project Repository}{18}{section.17}%
 \contentsline {subsection}{\numberline {17.1}Repository Structure}{18}{subsection.17.1}%
+<<<<<<< HEAD
 >>>>>>> 0d6e0e07856857f09ea4ffe17316370f7cad71ce
+=======
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4

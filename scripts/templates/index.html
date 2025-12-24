@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PKG2020 Knowledge Graph Explorer</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+<<<<<<< HEAD
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -32,11 +33,24 @@
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
             --radius: 12px;
             --radius-lg: 16px;
+=======
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e94560;
+            --secondary: #0f3460;
+            --accent: #f39c12;
+            --bg-dark: #0a0a1a;
+            --bg-card: rgba(255,255,255,0.05);
+            --text: #ffffff;
+            --text-muted: #888;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
+<<<<<<< HEAD
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg-primary);
             color: var(--text);
@@ -52,10 +66,44 @@
         
         .particle {
             display: none;
+=======
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Floating particles background */
+        .particles {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         /* Header */
         .header {
+<<<<<<< HEAD
             background: var(--bg-secondary);
             padding: 1.25rem 2rem;
             position: sticky;
@@ -76,18 +124,47 @@
         
         .header h1 span.logo-icon {
             font-size: 1.75rem;
+=======
+            background: linear-gradient(135deg, var(--secondary), var(--bg-dark));
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         .header-subtitle {
             color: var(--text-muted);
+<<<<<<< HEAD
             font-size: 0.875rem;
             margin-top: 0.25rem;
             font-weight: 400;
+=======
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         /* Navigation Tabs */
         .nav-tabs {
             display: flex;
+<<<<<<< HEAD
             gap: 0.25rem;
             padding: 0.75rem 2rem;
             background: var(--bg-secondary);
@@ -120,13 +197,49 @@
             background: var(--primary);
             color: white;
             box-shadow: var(--shadow-sm);
+=======
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: rgba(0,0,0,0.3);
+            overflow-x: auto;
+        }
+        
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--bg-card);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+        
+        .nav-tab:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(233,69,96,0.2);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-color: transparent;
+            box-shadow: 0 10px 30px rgba(233,69,96,0.3);
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         /* Container */
         .container {
+<<<<<<< HEAD
             max-width: 1400px;
             margin: 0 auto;
             padding: 1.5rem 2rem;
+=======
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
             position: relative;
             z-index: 1;
         }
@@ -134,6 +247,7 @@
         /* Stats Grid */
         .stats-grid {
             display: grid;
+<<<<<<< HEAD
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 1rem;
             margin-bottom: 1.5rem;
@@ -162,10 +276,41 @@
         
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
+=======
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+        
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.15s; }
+        .stat-card:nth-child(3) { animation-delay: 0.2s; }
+        .stat-card:nth-child(4) { animation-delay: 0.25s; }
+        .stat-card:nth-child(5) { animation-delay: 0.3s; }
+        .stat-card:nth-child(6) { animation-delay: 0.35s; }
+        .stat-card:nth-child(7) { animation-delay: 0.4s; }
+        .stat-card:nth-child(8) { animation-delay: 0.45s; }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
             to { opacity: 1; transform: translateY(0); }
         }
         
         .stat-card:hover {
+<<<<<<< HEAD
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
             border-color: var(--primary-light);
@@ -176,19 +321,41 @@
             font-weight: 700;
             color: var(--primary);
             letter-spacing: -0.025em;
+=======
+            transform: translateY(-5px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(233,69,96,0.15);
+        }
+        
+        .stat-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         .stat-card p {
             color: var(--text-muted);
+<<<<<<< HEAD
             font-size: 0.8rem;
             margin-top: 0.375rem;
             font-weight: 500;
+=======
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         /* Tab Content */
         .tab-content {
             display: none;
+<<<<<<< HEAD
             animation: fadeIn 0.25s ease;
+=======
+            animation: fadeIn 0.3s ease;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         .tab-content.active {
@@ -202,6 +369,7 @@
         
         /* Panel */
         .panel {
+<<<<<<< HEAD
             background: var(--bg-secondary);
             border-radius: var(--radius-lg);
             border: 1px solid var(--border);
@@ -212,18 +380,34 @@
         
         .panel-title {
             font-size: 1.125rem;
+=======
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .panel-title {
+            font-size: 1.25rem;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
             font-weight: 600;
             margin-bottom: 1rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+<<<<<<< HEAD
             color: var(--text);
+=======
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         /* Query Editor */
         .query-editor {
             width: 100%;
             min-height: 200px;
+<<<<<<< HEAD
             background: var(--bg-code);
             border: 1px solid var(--border);
             border-radius: var(--radius);
@@ -233,16 +417,30 @@
             font-size: 0.875rem;
             resize: vertical;
             line-height: 1.6;
+=======
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            color: var(--text);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         .query-editor:focus {
             outline: none;
             border-color: var(--primary);
+<<<<<<< HEAD
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+=======
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         /* Buttons */
         .btn {
+<<<<<<< HEAD
             padding: 0.625rem 1.25rem;
             border-radius: 8px;
             border: none;
@@ -257,10 +455,24 @@
         
         .btn-primary {
             background: var(--primary);
+=======
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
             color: white;
         }
         
         .btn-primary:hover {
+<<<<<<< HEAD
             background: var(--primary-dark);
             box-shadow: var(--shadow-md);
         }
@@ -274,6 +486,16 @@
         .btn-secondary:hover {
             background: var(--border);
             color: var(--text);
+=======
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(233,69,96,0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.2);
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         /* Select Dropdown */
@@ -282,6 +504,7 @@
         }
         
         select {
+<<<<<<< HEAD
             padding: 0.625rem 1rem;
             border-radius: 8px;
             border: 1px solid var(--border);
@@ -291,12 +514,25 @@
             min-width: 250px;
             cursor: pointer;
             font-family: inherit;
+=======
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.4);
+            color: var(--text);
+            font-size: 0.9rem;
+            min-width: 250px;
+            cursor: pointer;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         select:focus {
             outline: none;
             border-color: var(--primary);
+<<<<<<< HEAD
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+=======
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         /* Results Table */
@@ -304,13 +540,17 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
+<<<<<<< HEAD
             font-size: 0.875rem;
+=======
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         .results-table th,
         .results-table td {
             padding: 0.75rem 1rem;
             text-align: left;
+<<<<<<< HEAD
             border-bottom: 1px solid var(--border);
         }
         
@@ -329,16 +569,35 @@
         
         .results-table td {
             color: var(--text-secondary);
+=======
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .results-table th {
+            background: rgba(233,69,96,0.2);
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .results-table tr:hover {
+            background: rgba(255,255,255,0.05);
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         /* Graph Container */
         #graph-container {
             width: 100%;
             height: 600px;
+<<<<<<< HEAD
             background: var(--bg-tertiary);
             border-radius: var(--radius);
             overflow: hidden;
             border: 1px solid var(--border);
+=======
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            overflow: hidden;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         #graph-container svg {
@@ -354,26 +613,44 @@
         }
         
         .chart-container {
+<<<<<<< HEAD
             background: var(--bg-tertiary);
             border-radius: var(--radius);
             padding: 1rem;
             min-height: 300px;
             border: 1px solid var(--border);
+=======
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 1rem;
+            min-height: 300px;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         /* Proof Section */
         .proof-card {
+<<<<<<< HEAD
             background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(8, 145, 178, 0.05));
             border: 1px solid var(--primary);
             border-radius: var(--radius-lg);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
+=======
+            background: linear-gradient(135deg, rgba(233,69,96,0.1), rgba(243,156,18,0.1));
+            border: 1px solid var(--primary);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         .proof-card h3 {
             color: var(--primary);
             margin-bottom: 1rem;
+<<<<<<< HEAD
             font-weight: 600;
+=======
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         .proof-list {
@@ -381,18 +658,30 @@
         }
         
         .proof-list li {
+<<<<<<< HEAD
             padding: 0.625rem 0;
             display: flex;
             align-items: center;
             gap: 0.75rem;
             color: var(--text-secondary);
+=======
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         .proof-list li::before {
             content: "✓";
+<<<<<<< HEAD
             color: var(--success);
             font-weight: bold;
             font-size: 1rem;
+=======
+            color: var(--accent);
+            font-weight: bold;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         /* Loading */
@@ -404,12 +693,21 @@
         }
         
         .spinner {
+<<<<<<< HEAD
             width: 36px;
             height: 36px;
             border: 3px solid var(--border);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
+=======
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         @keyframes spin {
@@ -421,6 +719,7 @@
             position: fixed;
             bottom: 2rem;
             right: 2rem;
+<<<<<<< HEAD
             width: 48px;
             height: 48px;
             border-radius: 50%;
@@ -431,17 +730,34 @@
             cursor: pointer;
             box-shadow: var(--shadow-lg);
             transition: all 0.2s ease;
+=======
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(233,69,96,0.4);
+            transition: all 0.3s ease;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
             z-index: 1000;
         }
         
         .fab:hover {
+<<<<<<< HEAD
             background: var(--primary-dark);
             transform: translateY(-2px);
+=======
+            transform: scale(1.1);
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         /* Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
+<<<<<<< HEAD
             height: 8px;
         }
         
@@ -495,12 +811,26 @@
             color: var(--success);
         }
         
+=======
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         /* Responsive */
         @media (max-width: 768px) {
             .results-viz {
                 grid-template-columns: 1fr;
             }
             .header h1 {
+<<<<<<< HEAD
                 font-size: 1.25rem;
             }
             .container {
@@ -528,6 +858,10 @@
             background: var(--bg-tertiary);
             border-radius: var(--radius);
             padding: 1rem;
+=======
+                font-size: 1.5rem;
+            }
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
     </style>
 </head>
@@ -583,7 +917,11 @@
                 <p style="color: var(--text-muted); margin-bottom: 1rem;">
                     Explore real instances from the GraphDB SPARQL endpoint. Select a class to visualize its relationships.
                 </p>
+<<<<<<< HEAD
                 <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center;">
+=======
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                     <select id="live-class-select" onchange="loadLiveGraph()">
                         <option value="Article">Articles</option>
                         <option value="Author">Authors</option>
@@ -592,10 +930,17 @@
                         <option value="Organization">Organizations</option>
                         <option value="Mutation">Mutations</option>
                     </select>
+<<<<<<< HEAD
                     <input type="number" id="live-limit" value="50" min="10" max="200" style="width: 80px;">
                     <button class="btn btn-primary" onclick="loadLiveGraph()">🔄 Load Graph</button>
                 </div>
                 <div id="live-graph-container" style="width: 100%; height: 600px; border-radius: 12px; overflow: hidden;"></div>
+=======
+                    <input type="number" id="live-limit" value="50" min="10" max="200" style="width: 80px; padding: 0.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.4); color: white;">
+                    <button class="btn btn-primary" onclick="loadLiveGraph()">🔄 Load Graph</button>
+                </div>
+                <div id="live-graph-container" style="width: 100%; height: 600px; background: rgba(0,0,0,0.3); border-radius: 20px; overflow: hidden;"></div>
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                 <p id="live-graph-status" style="color: var(--text-muted); margin-top: 1rem; text-align: center;"></p>
             </div>
         </div>
@@ -617,25 +962,42 @@
             <!-- Results Sub-tabs -->
             <div class="panel">
                 <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+<<<<<<< HEAD
                     <button class="btn btn-secondary" id="btn-table" onclick="showResultView('table')" style="background: var(--primary); color: white;">📋 Table View</button>
+=======
+                    <button class="btn btn-secondary" id="btn-table" onclick="showResultView('table')" style="background: var(--primary);">📋 Table View</button>
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                     <button class="btn btn-secondary" id="btn-graph" onclick="showResultView('graph')">🕸️ Graph View</button>
                     <button class="btn btn-secondary" id="btn-chart" onclick="showResultView('chart')">📊 Chart View</button>
                 </div>
                 
                 <div id="result-table-view">
+<<<<<<< HEAD
                     <h4 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 600;">📋 Query Results</h4>
+=======
+                    <h4 style="color: var(--text-muted); margin-bottom: 0.5rem;">📋 Query Results</h4>
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                     <div id="query-results">
                         <p style="color: var(--text-muted); text-align: center;">Execute a query to see results</p>
                     </div>
                 </div>
                 
                 <div id="result-graph-view" style="display: none;">
+<<<<<<< HEAD
                     <h4 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 600;">🕸️ Results as Graph</h4>
                     <div id="results-graph-container" style="width: 100%; height: 500px; border-radius: 12px;"></div>
                 </div>
                 
                 <div id="result-chart-view" style="display: none;">
                     <h4 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 600;">📊 Results Chart</h4>
+=======
+                    <h4 style="color: var(--text-muted); margin-bottom: 0.5rem;">🕸️ Results as Graph</h4>
+                    <div id="results-graph-container" style="width: 100%; height: 500px; background: rgba(0,0,0,0.3); border-radius: 15px;"></div>
+                </div>
+                
+                <div id="result-chart-view" style="display: none;">
+                    <h4 style="color: var(--text-muted); margin-bottom: 0.5rem;">📊 Results Chart</h4>
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                     <div id="results-chart" style="height: 400px;"></div>
                 </div>
             </div>
@@ -794,14 +1156,23 @@
                 .nice()
                 .range([height - margin.bottom, margin.top]);
             
+<<<<<<< HEAD
             // Gradient - updated to professional blue theme
+=======
+            // Gradient
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
             const gradient = svg.append('defs')
                 .append('linearGradient')
                 .attr('id', 'barGradient')
                 .attr('x1', '0%').attr('y1', '0%')
                 .attr('x2', '0%').attr('y2', '100%');
+<<<<<<< HEAD
             gradient.append('stop').attr('offset', '0%').attr('stop-color', '#2563eb');
             gradient.append('stop').attr('offset', '100%').attr('stop-color', '#0891b2');
+=======
+            gradient.append('stop').attr('offset', '0%').attr('stop-color', '#e94560');
+            gradient.append('stop').attr('offset', '100%').attr('stop-color', '#f39c12');
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
             
             // Bars with animation
             svg.selectAll('rect')
@@ -813,7 +1184,11 @@
                 .attr('width', x.bandwidth())
                 .attr('height', 0)
                 .attr('fill', 'url(#barGradient)')
+<<<<<<< HEAD
                 .attr('rx', 6)
+=======
+                .attr('rx', 8)
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                 .transition()
                 .duration(800)
                 .delay((d, i) => i * 100)
@@ -825,7 +1200,11 @@
                 .attr('transform', `translate(0,${height - margin.bottom})`)
                 .call(d3.axisBottom(x))
                 .selectAll('text')
+<<<<<<< HEAD
                 .attr('fill', '#64748b')
+=======
+                .attr('fill', '#888')
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                 .attr('transform', 'rotate(-45)')
                 .style('text-anchor', 'end');
             
@@ -834,7 +1213,11 @@
                 .attr('transform', `translate(${margin.left},0)`)
                 .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('.2s')))
                 .selectAll('text')
+<<<<<<< HEAD
                 .attr('fill', '#64748b');
+=======
+                .attr('fill', '#888');
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         // Load full graph with all 23 classes
@@ -860,13 +1243,21 @@
                     .force('charge', d3.forceManyBody().strength(-300))
                     .force('center', d3.forceCenter(width / 2, height / 2));
                 
+<<<<<<< HEAD
                 // Links - updated to lighter color for light theme
+=======
+                // Links
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                 const link = svg.append('g')
                     .selectAll('line')
                     .data(data.links)
                     .enter()
                     .append('line')
+<<<<<<< HEAD
                     .attr('stroke', '#94a3b8')
+=======
+                    .attr('stroke', '#444')
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                     .attr('stroke-width', 2);
                 
                 // Nodes
@@ -884,16 +1275,25 @@
                         .on('drag', dragged)
                         .on('end', dragended));
                 
+<<<<<<< HEAD
                 // Labels - updated for light theme
+=======
+                // Labels
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                 const labels = svg.append('g')
                     .selectAll('text')
                     .data(data.nodes)
                     .enter()
                     .append('text')
                     .text(d => d.id)
+<<<<<<< HEAD
                     .attr('fill', '#0f172a')
                     .attr('font-size', '10px')
                     .attr('font-weight', '500')
+=======
+                    .attr('fill', '#fff')
+                    .attr('font-size', '10px')
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                     .attr('dx', 15)
                     .attr('dy', 4);
                 
@@ -986,7 +1386,11 @@
                 currentQueryResults = data;
                 
                 if (data.error) {
+<<<<<<< HEAD
                     resultsDiv.innerHTML = `<p style="color: #dc2626;">Error: ${data.error}</p>`;
+=======
+                    resultsDiv.innerHTML = `<p style="color: #e94560;">Error: ${data.error}</p>`;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                     return;
                 }
                 
@@ -1010,7 +1414,11 @@
                 
                 resultsDiv.innerHTML = html;
             } catch (e) {
+<<<<<<< HEAD
                 resultsDiv.innerHTML = `<p style="color: #dc2626;">Error: ${e.message}</p>`;
+=======
+                resultsDiv.innerHTML = `<p style="color: #e94560;">Error: ${e.message}</p>`;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
             }
         }
         
@@ -1062,7 +1470,11 @@
                 .attr('y', height - margin.bottom)
                 .attr('width', x.bandwidth())
                 .attr('height', 0)
+<<<<<<< HEAD
                 .attr('fill', '#2563eb')
+=======
+                .attr('fill', '#e94560')
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                 .attr('rx', 5)
                 .transition()
                 .duration(500)
@@ -1073,7 +1485,11 @@
                 .attr('transform', `translate(0,${height - margin.bottom})`)
                 .call(d3.axisBottom(x))
                 .selectAll('text')
+<<<<<<< HEAD
                 .attr('fill', '#64748b')
+=======
+                .attr('fill', '#888')
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                 .attr('transform', 'rotate(-45)')
                 .style('text-anchor', 'end');
             
@@ -1081,7 +1497,11 @@
                 .attr('transform', `translate(${margin.left},0)`)
                 .call(d3.axisLeft(y))
                 .selectAll('text')
+<<<<<<< HEAD
                 .attr('fill', '#64748b');
+=======
+                .attr('fill', '#888');
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
         }
         
         function clearQuery() {
@@ -1143,12 +1563,18 @@
             document.getElementById('result-graph-view').style.display = view === 'graph' ? 'block' : 'none';
             document.getElementById('result-chart-view').style.display = view === 'chart' ? 'block' : 'none';
             
+<<<<<<< HEAD
             document.getElementById('btn-table').style.background = view === 'table' ? 'var(--primary)' : 'var(--bg-tertiary)';
             document.getElementById('btn-table').style.color = view === 'table' ? 'white' : 'var(--text-secondary)';
             document.getElementById('btn-graph').style.background = view === 'graph' ? 'var(--primary)' : 'var(--bg-tertiary)';
             document.getElementById('btn-graph').style.color = view === 'graph' ? 'white' : 'var(--text-secondary)';
             document.getElementById('btn-chart').style.background = view === 'chart' ? 'var(--primary)' : 'var(--bg-tertiary)';
             document.getElementById('btn-chart').style.color = view === 'chart' ? 'white' : 'var(--text-secondary)';
+=======
+            document.getElementById('btn-table').style.background = view === 'table' ? 'var(--primary)' : 'rgba(255,255,255,0.1)';
+            document.getElementById('btn-graph').style.background = view === 'graph' ? 'var(--primary)' : 'rgba(255,255,255,0.1)';
+            document.getElementById('btn-chart').style.background = view === 'chart' ? 'var(--primary)' : 'rgba(255,255,255,0.1)';
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
             
             if (view === 'graph' && currentQueryResults) {
                 renderResultsAsGraph(currentQueryResults);
@@ -1182,10 +1608,17 @@
                     const object = row[2];
                     
                     if (!nodes.has(subject)) {
+<<<<<<< HEAD
                         nodes.set(subject, { id: subject, type: 'subject', color: '#2563eb' });
                     }
                     if (!nodes.has(object)) {
                         nodes.set(object, { id: object, type: 'object', color: '#0891b2' });
+=======
+                        nodes.set(subject, { id: subject, type: 'subject', color: '#e94560' });
+                    }
+                    if (!nodes.has(object)) {
+                        nodes.set(object, { id: object, type: 'object', color: '#0f3460' });
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                     }
                     links.push({ source: subject, target: object, label: predicate });
                 });
@@ -1194,7 +1627,11 @@
                 data.rows.forEach((row, i) => {
                     const id = row[0] || `node_${i}`;
                     if (!nodes.has(id)) {
+<<<<<<< HEAD
                         nodes.set(id, { id: id, type: 'node', color: '#2563eb' });
+=======
+                        nodes.set(id, { id: id, type: 'node', color: '#e94560' });
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                     }
                     // Link consecutive nodes
                     if (i > 0 && data.rows[i-1]) {
@@ -1214,45 +1651,118 @@
                 .attr('width', width)
                 .attr('height', height);
             
+<<<<<<< HEAD
             const simulation = d3.forceSimulation(nodesArray)
                 .force('link', d3.forceLink(linksFiltered).id(d => d.id).distance(80))
                 .force('charge', d3.forceManyBody().strength(-200))
                 .force('center', d3.forceCenter(width / 2, height / 2));
             
+=======
+            // Add arrow markers
+            svg.append('defs').append('marker')
+                .attr('id', 'arrow-results')
+                .attr('viewBox', '-0 -5 10 10')
+                .attr('refX', 18)
+                .attr('refY', 0)
+                .attr('orient', 'auto')
+                .attr('markerWidth', 5)
+                .attr('markerHeight', 5)
+                .append('path')
+                .attr('d', 'M 0,-5 L 10,0 L 0,5')
+                .attr('fill', '#888');
+            
+            const simulation = d3.forceSimulation(nodesArray)
+                .force('link', d3.forceLink(linksFiltered).id(d => d.id).distance(120))
+                .force('charge', d3.forceManyBody().strength(-250))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide().radius(40));
+            
+            // Draw edges
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
             const link = svg.append('g')
                 .selectAll('line')
                 .data(linksFiltered)
                 .enter().append('line')
+<<<<<<< HEAD
                 .attr('stroke', '#94a3b8')
                 .attr('stroke-width', 1.5);
             
+=======
+                .attr('stroke', '#666')
+                .attr('stroke-width', 2)
+                .attr('marker-end', 'url(#arrow-results)');
+            
+            // Draw edge labels (predicates)
+            const edgeLabels = svg.append('g')
+                .selectAll('text')
+                .data(linksFiltered)
+                .enter().append('text')
+                .text(d => d.label.substring(0, 18))
+                .attr('fill', '#f39c12')
+                .attr('font-size', '7px')
+                .attr('font-weight', 'bold')
+                .attr('text-anchor', 'middle');
+            
+            // Draw nodes
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
             const node = svg.append('g')
                 .selectAll('circle')
                 .data(nodesArray)
                 .enter().append('circle')
+<<<<<<< HEAD
                 .attr('r', 12)
                 .attr('fill', d => d.color)
                 .attr('stroke', '#fff')
                 .attr('stroke-width', 2)
+=======
+                .attr('r', d => d.type === 'subject' ? 14 : 10)
+                .attr('fill', d => d.color)
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 2)
+                .style('cursor', 'pointer')
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                 .call(d3.drag()
                     .on('start', (e) => { if (!e.active) simulation.alphaTarget(0.3).restart(); e.subject.fx = e.subject.x; e.subject.fy = e.subject.y; })
                     .on('drag', (e) => { e.subject.fx = e.x; e.subject.fy = e.y; })
                     .on('end', (e) => { if (!e.active) simulation.alphaTarget(0); e.subject.fx = null; e.subject.fy = null; }));
             
+<<<<<<< HEAD
+=======
+            // Tooltips
+            node.append('title').text(d => `${d.type.toUpperCase()}: ${d.id}`);
+            
+            // Draw ALL node labels
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
             const labels = svg.append('g')
                 .selectAll('text')
                 .data(nodesArray)
                 .enter().append('text')
+<<<<<<< HEAD
                 .text(d => d.id.substring(0, 15))
                 .attr('fill', '#0f172a')
                 .attr('font-size', '8px')
                 .attr('font-weight', '500')
                 .attr('dx', 15)
+=======
+                .text(d => d.id.length > 20 ? d.id.substring(0, 18) + '...' : d.id)
+                .attr('fill', d => d.type === 'subject' ? '#fff' : '#ccc')
+                .attr('font-size', d => d.type === 'subject' ? '9px' : '7px')
+                .attr('font-weight', d => d.type === 'subject' ? 'bold' : 'normal')
+                .attr('dx', d => (d.type === 'subject' ? 16 : 12))
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                 .attr('dy', 3);
             
             simulation.on('tick', () => {
                 link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
                     .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+<<<<<<< HEAD
+=======
+                    
+                edgeLabels
+                    .attr('x', d => (d.source.x + d.target.x) / 2)
+                    .attr('y', d => (d.source.y + d.target.y) / 2 - 4);
+                    
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                 node.attr('cx', d => d.x).attr('cy', d => d.y);
                 labels.attr('x', d => d.x).attr('y', d => d.y);
             });
@@ -1289,7 +1799,11 @@ LIMIT ${limit}`;
                 const data = await res.json();
                 
                 if (data.error) {
+<<<<<<< HEAD
                     container.innerHTML = `<p style="color: #dc2626; text-align: center; padding: 2rem;">Error: ${data.error}</p>`;
+=======
+                    container.innerHTML = `<p style="color: #e94560; text-align: center; padding: 2rem;">Error: ${data.error}</p>`;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                     status.textContent = '';
                     return;
                 }
@@ -1308,11 +1822,19 @@ LIMIT ${limit}`;
                     const object = row[2];
                     
                     if (!nodes.has(subject)) {
+<<<<<<< HEAD
                         nodes.set(subject, { id: subject, type: 'subject', color: '#2563eb', size: 20 });
                     }
                     if (!nodes.has(object)) {
                         const isLiteral = object.match(/^[0-9]/) || object.length > 50;
                         nodes.set(object, { id: object, type: isLiteral ? 'literal' : 'object', color: isLiteral ? '#10b981' : '#0891b2', size: isLiteral ? 10 : 15 });
+=======
+                        nodes.set(subject, { id: subject, type: 'subject', color: '#e94560', size: 20 });
+                    }
+                    if (!nodes.has(object)) {
+                        const isLiteral = object.match(/^[0-9]/) || object.length > 50;
+                        nodes.set(object, { id: object, type: isLiteral ? 'literal' : 'object', color: isLiteral ? '#f39c12' : '#0f3460', size: isLiteral ? 10 : 15 });
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                     }
                     links.push({ source: subject, target: object, label: predicate });
                 });
@@ -1326,18 +1848,60 @@ LIMIT ${limit}`;
                     .attr('width', width)
                     .attr('height', height);
                 
+<<<<<<< HEAD
                 const simulation = d3.forceSimulation(nodesArray)
                     .force('link', d3.forceLink(links).id(d => d.id).distance(100))
                     .force('charge', d3.forceManyBody().strength(-150))
                     .force('center', d3.forceCenter(width / 2, height / 2));
                 
+=======
+                // Add arrow markers for directed edges
+                svg.append('defs').append('marker')
+                    .attr('id', 'arrowhead')
+                    .attr('viewBox', '-0 -5 10 10')
+                    .attr('refX', 20)
+                    .attr('refY', 0)
+                    .attr('orient', 'auto')
+                    .attr('markerWidth', 6)
+                    .attr('markerHeight', 6)
+                    .append('path')
+                    .attr('d', 'M 0,-5 L 10,0 L 0,5')
+                    .attr('fill', '#888');
+                
+                const simulation = d3.forceSimulation(nodesArray)
+                    .force('link', d3.forceLink(links).id(d => d.id).distance(150))
+                    .force('charge', d3.forceManyBody().strength(-300))
+                    .force('center', d3.forceCenter(width / 2, height / 2))
+                    .force('collision', d3.forceCollide().radius(50));
+                
+                // Draw edges (lines)
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                 const link = svg.append('g')
                     .selectAll('line')
                     .data(links)
                     .enter().append('line')
+<<<<<<< HEAD
                     .attr('stroke', '#94a3b8')
                     .attr('stroke-width', 1.5);
                 
+=======
+                    .attr('stroke', '#666')
+                    .attr('stroke-width', 2)
+                    .attr('marker-end', 'url(#arrowhead)');
+                
+                // Draw edge labels (predicates)
+                const edgeLabels = svg.append('g')
+                    .selectAll('text')
+                    .data(links)
+                    .enter().append('text')
+                    .text(d => d.label.substring(0, 20))
+                    .attr('fill', '#f39c12')
+                    .attr('font-size', '8px')
+                    .attr('font-weight', 'bold')
+                    .attr('text-anchor', 'middle');
+                
+                // Draw nodes (circles)
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                 const node = svg.append('g')
                     .selectAll('circle')
                     .data(nodesArray)
@@ -1346,11 +1910,16 @@ LIMIT ${limit}`;
                     .attr('fill', d => d.color)
                     .attr('stroke', '#fff')
                     .attr('stroke-width', 2)
+<<<<<<< HEAD
+=======
+                    .style('cursor', 'pointer')
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                     .call(d3.drag()
                         .on('start', (e) => { if (!e.active) simulation.alphaTarget(0.3).restart(); e.subject.fx = e.subject.x; e.subject.fy = e.subject.y; })
                         .on('drag', (e) => { e.subject.fx = e.x; e.subject.fy = e.y; })
                         .on('end', (e) => { if (!e.active) simulation.alphaTarget(0); e.subject.fx = null; e.subject.fy = null; }));
                 
+<<<<<<< HEAD
                 // Tooltips
                 node.append('title').text(d => d.id);
                 
@@ -1369,11 +1938,46 @@ LIMIT ${limit}`;
                     link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
                         .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
                     node.attr('cx', d => d.x).attr('cy', d => d.y);
+=======
+                // Tooltips (full text on hover)
+                node.append('title').text(d => `${d.type.toUpperCase()}: ${d.id}`);
+                
+                // Draw ALL node labels
+                const labels = svg.append('g')
+                    .selectAll('text')
+                    .data(nodesArray)
+                    .enter().append('text')
+                    .text(d => d.id.length > 25 ? d.id.substring(0, 22) + '...' : d.id)
+                    .attr('fill', d => d.type === 'subject' ? '#fff' : '#ccc')
+                    .attr('font-size', d => d.type === 'subject' ? '10px' : '8px')
+                    .attr('font-weight', d => d.type === 'subject' ? 'bold' : 'normal')
+                    .attr('dx', d => d.size + 5)
+                    .attr('dy', 4);
+                
+                simulation.on('tick', () => {
+                    // Update link positions
+                    link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+                        .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+                    
+                    // Update edge label positions (midpoint of edge)
+                    edgeLabels
+                        .attr('x', d => (d.source.x + d.target.x) / 2)
+                        .attr('y', d => (d.source.y + d.target.y) / 2 - 5);
+                    
+                    // Update node positions
+                    node.attr('cx', d => d.x).attr('cy', d => d.y);
+                    
+                    // Update node label positions
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                     labels.attr('x', d => d.x).attr('y', d => d.y);
                 });
                 
             } catch (e) {
+<<<<<<< HEAD
                 container.innerHTML = `<p style="color: #dc2626; text-align: center; padding: 2rem;">Error: ${e.message}</p>`;
+=======
+                container.innerHTML = `<p style="color: #e94560; text-align: center; padding: 2rem;">Error: ${e.message}</p>`;
+>>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
                 status.textContent = '';
             }
         }
