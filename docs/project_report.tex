@@ -867,49 +867,6 @@ Our Flask-based web application provides:
     \item \textbf{12 Competency Queries}: Pre-built queries for common questions
 \end{enumerate}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-\subsection{GraphDB Setup and SPARQL Queries}
-
-To run SPARQL queries via GraphDB:
-
-\begin{enumerate}
-    \item Download GraphDB Free from \url{https://www.ontotext.com/products/graphdb/download/}
-    \item Create a new repository (e.g., ``pkg2020'')
-    \item Import \texttt{owl/pkg2020\_sample.ttl} or \texttt{pkg2020\_final.ttl}
-    \item Navigate to SPARQL $\rightarrow$ Query
-    \item Run the competency queries from Section 9
-\end{enumerate}
-
-Alternatively, use GraphDB Sandbox (cloud-hosted):
-\begin{enumerate}
-    \item Go to \url{https://graphdb.ontotext.com/}
-    \item Create a free account and new repository
-    \item Upload the TTL file via Import $\rightarrow$ RDF
-    \item Access the SPARQL endpoint
-\end{enumerate}
-
-\subsection{Sample GraphDB Query Session}
-
-\begin{lstlisting}[language=SPARQL, caption=GraphDB Query Example]
-# Count all entities by type
-PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
-
-SELECT ?type (COUNT(?entity) AS ?count)
-WHERE {
-    ?entity a ?type .
-    FILTER(STRSTARTS(STR(?type), 
-           "http://example.org/pkg2020/"))
-}
-GROUP BY ?type
-ORDER BY DESC(?count)
-\end{lstlisting}
-=======
-=======
->>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
-=======
->>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[
@@ -946,13 +903,6 @@ https://x1327f4041a654297998.sandbox.graphwise.ai
     \item 14 object properties
     \item 17+ data properties
 \end{itemize}
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 0d6e0e07856857f09ea4ffe17316370f7cad71ce
-=======
->>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
-=======
->>>>>>> 8d07ca44aa479971f1d71d8c1b8f99b522c544d4
 
 %==============================================================================
 \section{Reflection}
