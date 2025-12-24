@@ -5,123 +5,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PKG2020 Knowledge Graph Explorer</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #e94560;
-            --secondary: #0f3460;
-            --accent: #f39c12;
-            --bg-dark: #0a0a1a;
-            --bg-card: rgba(255,255,255,0.05);
-            --text: #ffffff;
-            --text-muted: #888;
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --accent: #0891b2;
+            --accent-light: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --bg-code: #1e293b;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
         }
         
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg-dark);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
+            line-height: 1.6;
         }
         
-        /* Floating particles background */
+        /* Remove particles for cleaner look */
         .particles {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
+            display: none;
         }
         
         .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--primary);
-            border-radius: 50%;
-            opacity: 0.3;
-            animation: float 15s infinite ease-in-out;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.3; }
-            90% { opacity: 0.3; }
-            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+            display: none;
         }
         
         /* Header */
         .header {
-            background: linear-gradient(135deg, var(--secondary), var(--bg-dark));
-            padding: 1.5rem 2rem;
+            background: var(--bg-secondary);
+            padding: 1.25rem 2rem;
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
         }
         
         .header h1 {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shimmer 3s infinite;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
-        @keyframes shimmer {
-            0%, 100% { filter: brightness(1); }
-            50% { filter: brightness(1.2); }
+        .header h1 span.logo-icon {
+            font-size: 1.75rem;
         }
         
         .header-subtitle {
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             margin-top: 0.25rem;
+            font-weight: 400;
         }
         
         /* Navigation Tabs */
         .nav-tabs {
             display: flex;
-            gap: 0.5rem;
-            padding: 1rem 2rem;
-            background: rgba(0,0,0,0.3);
+            gap: 0.25rem;
+            padding: 0.75rem 2rem;
+            background: var(--bg-secondary);
             overflow-x: auto;
+            border-bottom: 1px solid var(--border);
         }
         
         .nav-tab {
-            padding: 0.75rem 1.5rem;
-            border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: var(--bg-card);
-            color: var(--text);
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
             cursor: pointer;
             font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .nav-tab:hover {
-            transform: translateY(-2px);
-            border-color: var(--primary);
-            box-shadow: 0 10px 30px rgba(233,69,96,0.2);
+            background: var(--bg-tertiary);
+            color: var(--text);
         }
         
         .nav-tab.active {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-color: transparent;
-            box-shadow: 0 10px 30px rgba(233,69,96,0.3);
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-sm);
         }
         
         /* Container */
         .container {
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 1.5rem 2rem;
             position: relative;
             z-index: 1;
         }
@@ -129,61 +134,61 @@
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 1rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
         
         .stat-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 1.25rem;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.3s ease;
-            animation: fadeInUp 0.5s ease forwards;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+            animation: fadeInUp 0.4s ease forwards;
             opacity: 0;
+            box-shadow: var(--shadow-sm);
         }
         
-        .stat-card:nth-child(1) { animation-delay: 0.1s; }
-        .stat-card:nth-child(2) { animation-delay: 0.15s; }
-        .stat-card:nth-child(3) { animation-delay: 0.2s; }
-        .stat-card:nth-child(4) { animation-delay: 0.25s; }
-        .stat-card:nth-child(5) { animation-delay: 0.3s; }
-        .stat-card:nth-child(6) { animation-delay: 0.35s; }
-        .stat-card:nth-child(7) { animation-delay: 0.4s; }
-        .stat-card:nth-child(8) { animation-delay: 0.45s; }
+        .stat-card:nth-child(1) { animation-delay: 0.05s; }
+        .stat-card:nth-child(2) { animation-delay: 0.1s; }
+        .stat-card:nth-child(3) { animation-delay: 0.15s; }
+        .stat-card:nth-child(4) { animation-delay: 0.2s; }
+        .stat-card:nth-child(5) { animation-delay: 0.25s; }
+        .stat-card:nth-child(6) { animation-delay: 0.3s; }
+        .stat-card:nth-child(7) { animation-delay: 0.35s; }
+        .stat-card:nth-child(8) { animation-delay: 0.4s; }
         
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
         .stat-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            border-color: var(--primary);
-            box-shadow: 0 20px 40px rgba(233,69,96,0.15);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary-light);
         }
         
         .stat-card h3 {
-            font-size: 2rem;
+            font-size: 1.75rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--primary);
+            letter-spacing: -0.025em;
         }
         
         .stat-card p {
             color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            margin-top: 0.375rem;
+            font-weight: 500;
         }
         
         /* Tab Content */
         .tab-content {
             display: none;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.25s ease;
         }
         
         .tab-content.active {
@@ -197,67 +202,78 @@
         
         /* Panel */
         .panel {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
         }
         
         .panel-title {
-            font-size: 1.25rem;
+            font-size: 1.125rem;
             font-weight: 600;
             margin-bottom: 1rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            color: var(--text);
         }
         
         /* Query Editor */
         .query-editor {
             width: 100%;
             min-height: 200px;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             padding: 1rem;
-            color: var(--text);
-            font-family: 'Fira Code', monospace;
-            font-size: 0.9rem;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.875rem;
             resize: vertical;
+            line-height: 1.6;
         }
         
         .query-editor:focus {
             outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
         
         /* Buttons */
         .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 12px;
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
             border: none;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background: var(--primary);
             color: white;
         }
         
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(233,69,96,0.3);
+            background: var(--primary-dark);
+            box-shadow: var(--shadow-md);
         }
         
         .btn-secondary {
-            background: rgba(255,255,255,0.1);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border);
             color: var(--text);
-            border: 1px solid rgba(255,255,255,0.2);
         }
         
         /* Select Dropdown */
@@ -266,19 +282,21 @@
         }
         
         select {
-            padding: 0.75rem 1rem;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(0,0,0,0.4);
+            padding: 0.625rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
             color: var(--text);
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             min-width: 250px;
             cursor: pointer;
+            font-family: inherit;
         }
         
         select:focus {
             outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
         
         /* Results Table */
@@ -286,32 +304,41 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 1rem;
+            font-size: 0.875rem;
         }
         
         .results-table th,
         .results-table td {
             padding: 0.75rem 1rem;
             text-align: left;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid var(--border);
         }
         
         .results-table th {
-            background: rgba(233,69,96,0.2);
+            background: var(--bg-tertiary);
             font-weight: 600;
-            color: var(--primary);
+            color: var(--text);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
         
         .results-table tr:hover {
-            background: rgba(255,255,255,0.05);
+            background: var(--bg-tertiary);
+        }
+        
+        .results-table td {
+            color: var(--text-secondary);
         }
         
         /* Graph Container */
         #graph-container {
             width: 100%;
             height: 600px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 20px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
             overflow: hidden;
+            border: 1px solid var(--border);
         }
         
         #graph-container svg {
@@ -327,24 +354,26 @@
         }
         
         .chart-container {
-            background: rgba(0,0,0,0.3);
-            border-radius: 15px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
             padding: 1rem;
             min-height: 300px;
+            border: 1px solid var(--border);
         }
         
         /* Proof Section */
         .proof-card {
-            background: linear-gradient(135deg, rgba(233,69,96,0.1), rgba(243,156,18,0.1));
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(8, 145, 178, 0.05));
             border: 1px solid var(--primary);
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
         }
         
         .proof-card h3 {
             color: var(--primary);
             margin-bottom: 1rem;
+            font-weight: 600;
         }
         
         .proof-list {
@@ -352,16 +381,18 @@
         }
         
         .proof-list li {
-            padding: 0.5rem 0;
+            padding: 0.625rem 0;
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            color: var(--text-secondary);
         }
         
         .proof-list li::before {
             content: "✓";
-            color: var(--accent);
+            color: var(--success);
             font-weight: bold;
+            font-size: 1rem;
         }
         
         /* Loading */
@@ -373,12 +404,12 @@
         }
         
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255,255,255,0.1);
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
             border-top-color: var(--primary);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
         }
         
         @keyframes spin {
@@ -390,35 +421,78 @@
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            width: 60px;
-            height: 60px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background: var(--primary);
             border: none;
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             cursor: pointer;
-            box-shadow: 0 10px 40px rgba(233,69,96,0.4);
-            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.2s ease;
             z-index: 1000;
         }
         
         .fab:hover {
-            transform: scale(1.1);
+            background: var(--primary-dark);
+            transform: translateY(-2px);
         }
         
         /* Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
+            height: 8px;
         }
         
         ::-webkit-scrollbar-track {
-            background: var(--bg-dark);
+            background: var(--bg-tertiary);
         }
         
         ::-webkit-scrollbar-thumb {
-            background: var(--primary);
+            background: var(--border);
             border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+        
+        /* Input fields */
+        input[type="number"] {
+            padding: 0.625rem 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.875rem;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        /* Badge styles */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.625rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-primary {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+        }
+        
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
         }
         
         /* Responsive */
@@ -427,8 +501,33 @@
                 grid-template-columns: 1fr;
             }
             .header h1 {
-                font-size: 1.5rem;
+                font-size: 1.25rem;
             }
+            .container {
+                padding: 1rem;
+            }
+            .nav-tabs {
+                padding: 0.5rem 1rem;
+            }
+        }
+        
+        /* Live graph container */
+        #live-graph-container {
+            background: var(--bg-tertiary) !important;
+            border: 1px solid var(--border);
+        }
+        
+        /* Results graph container */
+        #results-graph-container {
+            background: var(--bg-tertiary) !important;
+            border: 1px solid var(--border);
+        }
+        
+        /* Chart styling */
+        #results-chart, #overview-chart {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            padding: 1rem;
         }
     </style>
 </head>
@@ -484,7 +583,7 @@
                 <p style="color: var(--text-muted); margin-bottom: 1rem;">
                     Explore real instances from the GraphDB SPARQL endpoint. Select a class to visualize its relationships.
                 </p>
-                <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center;">
                     <select id="live-class-select" onchange="loadLiveGraph()">
                         <option value="Article">Articles</option>
                         <option value="Author">Authors</option>
@@ -493,10 +592,10 @@
                         <option value="Organization">Organizations</option>
                         <option value="Mutation">Mutations</option>
                     </select>
-                    <input type="number" id="live-limit" value="50" min="10" max="200" style="width: 80px; padding: 0.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.4); color: white;">
+                    <input type="number" id="live-limit" value="50" min="10" max="200" style="width: 80px;">
                     <button class="btn btn-primary" onclick="loadLiveGraph()">🔄 Load Graph</button>
                 </div>
-                <div id="live-graph-container" style="width: 100%; height: 600px; background: rgba(0,0,0,0.3); border-radius: 20px; overflow: hidden;"></div>
+                <div id="live-graph-container" style="width: 100%; height: 600px; border-radius: 12px; overflow: hidden;"></div>
                 <p id="live-graph-status" style="color: var(--text-muted); margin-top: 1rem; text-align: center;"></p>
             </div>
         </div>
@@ -518,25 +617,25 @@
             <!-- Results Sub-tabs -->
             <div class="panel">
                 <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                    <button class="btn btn-secondary" id="btn-table" onclick="showResultView('table')" style="background: var(--primary);">📋 Table View</button>
+                    <button class="btn btn-secondary" id="btn-table" onclick="showResultView('table')" style="background: var(--primary); color: white;">📋 Table View</button>
                     <button class="btn btn-secondary" id="btn-graph" onclick="showResultView('graph')">🕸️ Graph View</button>
                     <button class="btn btn-secondary" id="btn-chart" onclick="showResultView('chart')">📊 Chart View</button>
                 </div>
                 
                 <div id="result-table-view">
-                    <h4 style="color: var(--text-muted); margin-bottom: 0.5rem;">📋 Query Results</h4>
+                    <h4 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 600;">📋 Query Results</h4>
                     <div id="query-results">
                         <p style="color: var(--text-muted); text-align: center;">Execute a query to see results</p>
                     </div>
                 </div>
                 
                 <div id="result-graph-view" style="display: none;">
-                    <h4 style="color: var(--text-muted); margin-bottom: 0.5rem;">🕸️ Results as Graph</h4>
-                    <div id="results-graph-container" style="width: 100%; height: 500px; background: rgba(0,0,0,0.3); border-radius: 15px;"></div>
+                    <h4 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 600;">🕸️ Results as Graph</h4>
+                    <div id="results-graph-container" style="width: 100%; height: 500px; border-radius: 12px;"></div>
                 </div>
                 
                 <div id="result-chart-view" style="display: none;">
-                    <h4 style="color: var(--text-muted); margin-bottom: 0.5rem;">📊 Results Chart</h4>
+                    <h4 style="color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 600;">📊 Results Chart</h4>
                     <div id="results-chart" style="height: 400px;"></div>
                 </div>
             </div>
@@ -695,14 +794,14 @@
                 .nice()
                 .range([height - margin.bottom, margin.top]);
             
-            // Gradient
+            // Gradient - updated to professional blue theme
             const gradient = svg.append('defs')
                 .append('linearGradient')
                 .attr('id', 'barGradient')
                 .attr('x1', '0%').attr('y1', '0%')
                 .attr('x2', '0%').attr('y2', '100%');
-            gradient.append('stop').attr('offset', '0%').attr('stop-color', '#e94560');
-            gradient.append('stop').attr('offset', '100%').attr('stop-color', '#f39c12');
+            gradient.append('stop').attr('offset', '0%').attr('stop-color', '#2563eb');
+            gradient.append('stop').attr('offset', '100%').attr('stop-color', '#0891b2');
             
             // Bars with animation
             svg.selectAll('rect')
@@ -714,7 +813,7 @@
                 .attr('width', x.bandwidth())
                 .attr('height', 0)
                 .attr('fill', 'url(#barGradient)')
-                .attr('rx', 8)
+                .attr('rx', 6)
                 .transition()
                 .duration(800)
                 .delay((d, i) => i * 100)
@@ -726,7 +825,7 @@
                 .attr('transform', `translate(0,${height - margin.bottom})`)
                 .call(d3.axisBottom(x))
                 .selectAll('text')
-                .attr('fill', '#888')
+                .attr('fill', '#64748b')
                 .attr('transform', 'rotate(-45)')
                 .style('text-anchor', 'end');
             
@@ -735,7 +834,7 @@
                 .attr('transform', `translate(${margin.left},0)`)
                 .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('.2s')))
                 .selectAll('text')
-                .attr('fill', '#888');
+                .attr('fill', '#64748b');
         }
         
         // Load full graph with all 23 classes
@@ -761,13 +860,13 @@
                     .force('charge', d3.forceManyBody().strength(-300))
                     .force('center', d3.forceCenter(width / 2, height / 2));
                 
-                // Links
+                // Links - updated to lighter color for light theme
                 const link = svg.append('g')
                     .selectAll('line')
                     .data(data.links)
                     .enter()
                     .append('line')
-                    .attr('stroke', '#444')
+                    .attr('stroke', '#94a3b8')
                     .attr('stroke-width', 2);
                 
                 // Nodes
@@ -785,15 +884,16 @@
                         .on('drag', dragged)
                         .on('end', dragended));
                 
-                // Labels
+                // Labels - updated for light theme
                 const labels = svg.append('g')
                     .selectAll('text')
                     .data(data.nodes)
                     .enter()
                     .append('text')
                     .text(d => d.id)
-                    .attr('fill', '#fff')
+                    .attr('fill', '#0f172a')
                     .attr('font-size', '10px')
+                    .attr('font-weight', '500')
                     .attr('dx', 15)
                     .attr('dy', 4);
                 
@@ -886,7 +986,7 @@
                 currentQueryResults = data;
                 
                 if (data.error) {
-                    resultsDiv.innerHTML = `<p style="color: #e94560;">Error: ${data.error}</p>`;
+                    resultsDiv.innerHTML = `<p style="color: #dc2626;">Error: ${data.error}</p>`;
                     return;
                 }
                 
@@ -910,7 +1010,7 @@
                 
                 resultsDiv.innerHTML = html;
             } catch (e) {
-                resultsDiv.innerHTML = `<p style="color: #e94560;">Error: ${e.message}</p>`;
+                resultsDiv.innerHTML = `<p style="color: #dc2626;">Error: ${e.message}</p>`;
             }
         }
         
@@ -962,7 +1062,7 @@
                 .attr('y', height - margin.bottom)
                 .attr('width', x.bandwidth())
                 .attr('height', 0)
-                .attr('fill', '#e94560')
+                .attr('fill', '#2563eb')
                 .attr('rx', 5)
                 .transition()
                 .duration(500)
@@ -973,7 +1073,7 @@
                 .attr('transform', `translate(0,${height - margin.bottom})`)
                 .call(d3.axisBottom(x))
                 .selectAll('text')
-                .attr('fill', '#888')
+                .attr('fill', '#64748b')
                 .attr('transform', 'rotate(-45)')
                 .style('text-anchor', 'end');
             
@@ -981,7 +1081,7 @@
                 .attr('transform', `translate(${margin.left},0)`)
                 .call(d3.axisLeft(y))
                 .selectAll('text')
-                .attr('fill', '#888');
+                .attr('fill', '#64748b');
         }
         
         function clearQuery() {
@@ -1043,9 +1143,12 @@
             document.getElementById('result-graph-view').style.display = view === 'graph' ? 'block' : 'none';
             document.getElementById('result-chart-view').style.display = view === 'chart' ? 'block' : 'none';
             
-            document.getElementById('btn-table').style.background = view === 'table' ? 'var(--primary)' : 'rgba(255,255,255,0.1)';
-            document.getElementById('btn-graph').style.background = view === 'graph' ? 'var(--primary)' : 'rgba(255,255,255,0.1)';
-            document.getElementById('btn-chart').style.background = view === 'chart' ? 'var(--primary)' : 'rgba(255,255,255,0.1)';
+            document.getElementById('btn-table').style.background = view === 'table' ? 'var(--primary)' : 'var(--bg-tertiary)';
+            document.getElementById('btn-table').style.color = view === 'table' ? 'white' : 'var(--text-secondary)';
+            document.getElementById('btn-graph').style.background = view === 'graph' ? 'var(--primary)' : 'var(--bg-tertiary)';
+            document.getElementById('btn-graph').style.color = view === 'graph' ? 'white' : 'var(--text-secondary)';
+            document.getElementById('btn-chart').style.background = view === 'chart' ? 'var(--primary)' : 'var(--bg-tertiary)';
+            document.getElementById('btn-chart').style.color = view === 'chart' ? 'white' : 'var(--text-secondary)';
             
             if (view === 'graph' && currentQueryResults) {
                 renderResultsAsGraph(currentQueryResults);
@@ -1079,10 +1182,10 @@
                     const object = row[2];
                     
                     if (!nodes.has(subject)) {
-                        nodes.set(subject, { id: subject, type: 'subject', color: '#e94560' });
+                        nodes.set(subject, { id: subject, type: 'subject', color: '#2563eb' });
                     }
                     if (!nodes.has(object)) {
-                        nodes.set(object, { id: object, type: 'object', color: '#0f3460' });
+                        nodes.set(object, { id: object, type: 'object', color: '#0891b2' });
                     }
                     links.push({ source: subject, target: object, label: predicate });
                 });
@@ -1091,7 +1194,7 @@
                 data.rows.forEach((row, i) => {
                     const id = row[0] || `node_${i}`;
                     if (!nodes.has(id)) {
-                        nodes.set(id, { id: id, type: 'node', color: '#e94560' });
+                        nodes.set(id, { id: id, type: 'node', color: '#2563eb' });
                     }
                     // Link consecutive nodes
                     if (i > 0 && data.rows[i-1]) {
@@ -1120,7 +1223,7 @@
                 .selectAll('line')
                 .data(linksFiltered)
                 .enter().append('line')
-                .attr('stroke', '#444')
+                .attr('stroke', '#94a3b8')
                 .attr('stroke-width', 1.5);
             
             const node = svg.append('g')
@@ -1141,8 +1244,9 @@
                 .data(nodesArray)
                 .enter().append('text')
                 .text(d => d.id.substring(0, 15))
-                .attr('fill', '#fff')
+                .attr('fill', '#0f172a')
                 .attr('font-size', '8px')
+                .attr('font-weight', '500')
                 .attr('dx', 15)
                 .attr('dy', 3);
             
@@ -1185,7 +1289,7 @@ LIMIT ${limit}`;
                 const data = await res.json();
                 
                 if (data.error) {
-                    container.innerHTML = `<p style="color: #e94560; text-align: center; padding: 2rem;">Error: ${data.error}</p>`;
+                    container.innerHTML = `<p style="color: #dc2626; text-align: center; padding: 2rem;">Error: ${data.error}</p>`;
                     status.textContent = '';
                     return;
                 }
@@ -1204,11 +1308,11 @@ LIMIT ${limit}`;
                     const object = row[2];
                     
                     if (!nodes.has(subject)) {
-                        nodes.set(subject, { id: subject, type: 'subject', color: '#e94560', size: 20 });
+                        nodes.set(subject, { id: subject, type: 'subject', color: '#2563eb', size: 20 });
                     }
                     if (!nodes.has(object)) {
                         const isLiteral = object.match(/^[0-9]/) || object.length > 50;
-                        nodes.set(object, { id: object, type: isLiteral ? 'literal' : 'object', color: isLiteral ? '#f39c12' : '#0f3460', size: isLiteral ? 10 : 15 });
+                        nodes.set(object, { id: object, type: isLiteral ? 'literal' : 'object', color: isLiteral ? '#10b981' : '#0891b2', size: isLiteral ? 10 : 15 });
                     }
                     links.push({ source: subject, target: object, label: predicate });
                 });
@@ -1231,7 +1335,7 @@ LIMIT ${limit}`;
                     .selectAll('line')
                     .data(links)
                     .enter().append('line')
-                    .attr('stroke', '#444')
+                    .attr('stroke', '#94a3b8')
                     .attr('stroke-width', 1.5);
                 
                 const node = svg.append('g')
@@ -1255,8 +1359,9 @@ LIMIT ${limit}`;
                     .data(nodesArray.filter(n => n.type === 'subject'))
                     .enter().append('text')
                     .text(d => d.id.substring(0, 20))
-                    .attr('fill', '#fff')
+                    .attr('fill', '#0f172a')
                     .attr('font-size', '9px')
+                    .attr('font-weight', '500')
                     .attr('dx', 15)
                     .attr('dy', 3);
                 
@@ -1268,7 +1373,7 @@ LIMIT ${limit}`;
                 });
                 
             } catch (e) {
-                container.innerHTML = `<p style="color: #e94560; text-align: center; padding: 2rem;">Error: ${e.message}</p>`;
+                container.innerHTML = `<p style="color: #dc2626; text-align: center; padding: 2rem;">Error: ${e.message}</p>`;
                 status.textContent = '';
             }
         }

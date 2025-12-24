@@ -2,7 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{geometry}
@@ -12,6 +12,8 @@
 \usepackage{amsmath}
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows,positioning}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
 
 \geometry{margin=1in}
 
@@ -758,26 +760,114 @@ As per the rubric requirement, we submit:
 \section{Visualization}
 %==============================================================================
 
+\subsection{Ontology Class Hierarchy}
+
+Figure \ref{fig:class-hierarchy} shows the class hierarchy of our ontology with 23 classes.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=0.8cm,
+    every node/.style={draw, rounded corners, minimum width=2cm, minimum height=0.6cm, font=\small},
+    core/.style={fill=red!20},
+    bio/.style={fill=green!20},
+    career/.style={fill=blue!20},
+    defined/.style={fill=yellow!20}
+]
+    % Core classes
+    \node[core] (thing) {owl:Thing};
+    
+    \node[core, below left=1cm and 2cm of thing] (article) {Article};
+    \node[core, below=1cm of thing] (author) {Author};
+    \node[core, below right=1cm and 2cm of thing] (org) {Organization};
+    
+    % Bio entities
+    \node[bio, below left=0.8cm and 0.5cm of article] (bioent) {BioEntity};
+    \node[bio, below left=0.6cm and -0.3cm of bioent] (gene) {Gene};
+    \node[bio, below=0.6cm of bioent] (disease) {Disease};
+    \node[bio, below right=0.6cm and -0.3cm of bioent] (mutation) {Mutation};
+    
+    % Career classes
+    \node[career, below left=0.8cm and -0.5cm of author] (emp) {Employment};
+    \node[career, below right=0.8cm and -0.5cm of author] (edu) {Education};
+    \node[career, below=1.5cm of author] (aff) {Affiliation};
+    
+    % Defined classes
+    \node[defined, right=0.5cm of author] (active) {ActiveAuthor};
+    \node[defined, below=0.5cm of active] (anon) {AnonymousAuthor};
+    
+    % Edges
+    \draw[->] (article) -- (thing);
+    \draw[->] (author) -- (thing);
+    \draw[->] (org) -- (thing);
+    \draw[->] (bioent) -- (thing);
+    \draw[->] (gene) -- (bioent);
+    \draw[->] (disease) -- (bioent);
+    \draw[->] (mutation) -- (bioent);
+    \draw[->] (active) -- (author);
+    \draw[->] (anon) -- (author);
+    
+\end{tikzpicture}
+\caption{Ontology Class Hierarchy (Partial View)}
+\label{fig:class-hierarchy}
+\end{figure}
+
+\subsection{Knowledge Graph Statistics}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+    \begin{axis}[
+        ybar,
+        bar width=15pt,
+        width=12cm,
+        height=7cm,
+        xlabel={Entity Type},
+        ylabel={Count (thousands)},
+        symbolic x coords={Authors, Articles, Orgs, Affiliations, Genes, Mutations, Diseases},
+        xtick=data,
+        x tick label style={rotate=45, anchor=east},
+        ymin=0,
+        nodes near coords,
+        nodes near coords style={font=\tiny},
+        every axis plot/.append style={fill=blue!30}
+    ]
+    \addplot coordinates {
+        (Authors, 37.9)
+        (Articles, 19.5)
+        (Orgs, 46.9)
+        (Affiliations, 50.0)
+        (Genes, 9.2)
+        (Mutations, 50.0)
+        (Diseases, 7.0)
+    };
+    \end{axis}
+\end{tikzpicture}
+\caption{Distribution of Entity Types in Knowledge Graph (2.1M+ triples)}
+\label{fig:entity-stats}
+\end{figure}
+
 \subsection{Tools Used}
 
 \begin{itemize}
     \item \textbf{Protégé}: Desktop ontology editor and visualizer
-    \item \textbf{GraphDB}: Triple store with SPARQL endpoint
+    \item \textbf{GraphDB Sandbox}: Cloud-hosted triple store with SPARQL endpoint
     \item \textbf{WebVOWL}: Online ontology visualization
-    \item \textbf{Custom Flask App}: Interactive web-based explorer
+    \item \textbf{Custom Flask App}: Interactive web-based explorer with D3.js graphs
 \end{itemize}
 
-\subsection{Visualization Guide}
+\subsection{Web Application Features}
 
-To visualize the ontology:
+Our Flask-based web application provides:
 
 \begin{enumerate}
-    \item Open \texttt{owl/pkg2020\_constrained.owl} in Protégé
-    \item Go to Window $\rightarrow$ Tabs $\rightarrow$ OntoGraf
-    \item Select classes to visualize
-    \item Export as image for reports
+    \item \textbf{Dashboard}: Real-time statistics fetched from GraphDB
+    \item \textbf{Live KG Explorer}: Interactive D3.js force-directed graph visualization
+    \item \textbf{SPARQL Query Editor}: Execute queries with Table/Graph/Chart views
+    \item \textbf{12 Competency Queries}: Pre-built queries for common questions
 \end{enumerate}
 
+<<<<<<< HEAD
 \subsection{GraphDB Setup and SPARQL Queries}
 
 To run SPARQL queries via GraphDB:
@@ -813,6 +903,44 @@ WHERE {
 GROUP BY ?type
 ORDER BY DESC(?count)
 \end{lstlisting}
+=======
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=1cm,
+    box/.style={draw, rounded corners, minimum width=2.5cm, minimum height=0.8cm, fill=blue!10}
+]
+    \node[box] (webapp) {Flask Web App};
+    \node[box, below left=1cm and 0.5cm of webapp] (sparql) {SPARQL Endpoint};
+    \node[box, below right=1cm and 0.5cm of webapp] (graphdb) {GraphDB Sandbox};
+    \node[box, below=2cm of webapp] (d3) {D3.js Visualization};
+    
+    \draw[->] (webapp) -- (sparql);
+    \draw[->] (webapp) -- (graphdb);
+    \draw[->] (webapp) -- (d3);
+    \draw[<->] (sparql) -- (graphdb);
+\end{tikzpicture}
+\caption{Web Application Architecture}
+\label{fig:webapp-arch}
+\end{figure}
+
+\subsection{Live GraphDB Endpoint}
+
+Our knowledge graph is accessible via the public SPARQL endpoint:
+
+\begin{verbatim}
+https://x1327f4041a654297998.sandbox.graphwise.ai
+    /repositories/KRR-Project
+\end{verbatim}
+
+\textbf{Statistics:}
+\begin{itemize}
+    \item 2,165,964 total triples
+    \item 23 ontology classes
+    \item 14 object properties
+    \item 17+ data properties
+\end{itemize}
+>>>>>>> 0d6e0e07856857f09ea4ffe17316370f7cad71ce
 
 %==============================================================================
 \section{Reflection}
