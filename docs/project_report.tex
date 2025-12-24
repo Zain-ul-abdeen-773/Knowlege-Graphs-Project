@@ -76,6 +76,9 @@
 \newpage
 \tableofcontents
 \newpage
+\listoffigures
+\listoftables
+\newpage
 
 %==============================================================================
 \section{Introduction to the Domain}
@@ -155,26 +158,56 @@ OA07\_NIH\_Projects.csv & NIH funding & $\sim$1.8 GB \\
 
 \subsection{Evidence of Non-RDF Status}
 
-The dataset is provided as flat CSV files without any semantic annotations, URI schemes, or linked data connections. It has not been published as RDF/OWL prior to this project.
+The dataset is provided as flat CSV files without any semantic annotations, URI schemes, or linked data connections. It has not been published as RDF/OWL prior to this project. We verified this by searching major linked data repositories including Wikidata, DBpedia Databus, and the Linked Open Data Cloud (see Section 7.3 for proof screenshots).
 
 %==============================================================================
 \section{Competency Questions}
 %==============================================================================
 
-The following competency questions guided our ontology design and will be answered through SPARQL queries:
+The following 15 competency questions guided our ontology design. Each question is answered through SPARQL queries (Section 9).
 
-\begin{enumerate}
-    \item Which authors have published in multiple institutions?
-    \item Which articles mention specific bio-entities (genes, diseases)?
-    \item Which authors have collaborated on joint publications?
-    \item Which authors have NIH funding?
-    \item What is the education background of prolific authors?
-    \item What is the employment timeline of researchers?
-    \item Which articles mention both mutations and diseases?
-    \item How many articles does each author have?
-    \item What organizations are most represented in the dataset?
-    \item Which researchers have both employment and education records?
-\end{enumerate}
+\begin{longtable}{|p{1cm}|p{8.5cm}|p{2.5cm}|}
+\hline
+\textbf{\#} & \textbf{Competency Question} & \textbf{Category} \\
+\hline
+\endfirsthead
+\hline
+\textbf{\#} & \textbf{Competency Question} & \textbf{Category} \\
+\hline
+\endhead
+CQ1 & Which authors have worked in multiple institutions? & Authors \\
+\hline
+CQ2 & Who are the most prolific authors by article count? & Authors \\
+\hline
+CQ3 & Which authors frequently collaborate together? & Authors \\
+\hline
+CQ4 & Which articles mention specific genes? & Articles \& Bio \\
+\hline
+CQ5 & Which articles mention species? & Articles \& Bio \\
+\hline
+CQ6 & Which articles mention both genes and mutations? & Articles \& Bio \\
+\hline
+CQ7 & What is the distribution of bio-entity types? & Statistics \\
+\hline
+CQ8 & Which organizations have the most affiliated authors? & Organizations \\
+\hline
+CQ9 & How are author affiliations distributed by country? & Affiliations \\
+\hline
+CQ10 & Which institutions produced the most researchers? & Education \\
+\hline
+CQ11 & What is the career timeline of researchers? & Employment \\
+\hline
+CQ12 & Which authors have education records? & Education \\
+\hline
+CQ13 & Which authors have NIH project funding? & NIH Projects \\
+\hline
+CQ14 & Who are the principal investigators and how many projects do they lead? & NIH Projects \\
+\hline
+CQ15 & Get the complete profile of an author (all relationships)? & Complex \\
+\hline
+\caption{15 Competency Questions for PKG2020 Ontology}
+\label{tab:competency-questions}
+\end{longtable}
 
 %==============================================================================
 \section{Conceptual Model}
@@ -490,6 +523,31 @@ for org in Organization.instances():
     org.dbpediaLink = [dbpedia_uri]
 \end{lstlisting}
 
+\subsection{Proof: Dataset Not Previously Available as Linked Data}
+
+Before this project, the PKG2020 dataset was not available as linked data. We verified this by searching major linked data repositories:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{Wikidata.png}
+\caption{Wikidata Search: No results for PKG2020 dataset}
+\label{fig:wikidata-proof}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{databus.png}
+\caption{DBpedia Databus Search: PKG2020 not found}
+\label{fig:databus-proof}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{LOD.png}
+\caption{Linked Open Data Cloud: Dataset not registered}
+\label{fig:lod-proof}
+\end{figure}
+
 %==============================================================================
 \section{Reasoning Scenarios}
 %==============================================================================
@@ -520,7 +578,7 @@ The reasoner successfully:
     \item Classified SingleAuthorArticle and MultiAuthorArticle
 \end{enumerate}
 
-\subsection{SWRL Rules (Bonus)}
+\subsection{SWRL Rules}
 
 We implemented 7 SWRL (Semantic Web Rule Language) rules for advanced reasoning:
 
@@ -594,41 +652,45 @@ After running the HermiT reasoner on the hand-annotated individuals:
 \section{SPARQL Queries}
 %==============================================================================
 
-\subsection{Query 1: Authors with Multiple Affiliations}
+This section presents all 15 SPARQL queries answering the competency questions. All queries are tested against our live GraphDB endpoint.
 
-\begin{lstlisting}[language=SPARQL, caption=Multiple Affiliations Query]
+\subsection{Author Queries (CQ1-CQ3)}
+
+\subsubsection{CQ1: Authors with Multiple Institutions}
+\begin{lstlisting}[language=SPARQL, caption=CQ1: Authors at Multiple Institutions]
 PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
 
-SELECT ?author (COUNT(DISTINCT ?org) AS ?orgCount)
+SELECT ?author ?lastName (COUNT(DISTINCT ?org) AS ?orgCount)
 WHERE {
     ?author a pkg:Author .
+    ?author pkg:lastName ?lastName .
     ?author pkg:hasAffiliation ?aff .
     ?aff pkg:affiliatedWith ?org .
 }
-GROUP BY ?author
+GROUP BY ?author ?lastName
 HAVING (COUNT(DISTINCT ?org) > 1)
 ORDER BY DESC(?orgCount)
-LIMIT 20
+LIMIT 100
 \end{lstlisting}
 
-\subsection{Query 2: Articles Mentioning Genes}
-
-\begin{lstlisting}[language=SPARQL, caption=BioEntity Query]
+\subsubsection{CQ2: Most Prolific Authors}
+\begin{lstlisting}[language=SPARQL, caption=CQ2: Prolific Authors by Article Count]
 PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
 
-SELECT ?article ?gene ?geneName
+SELECT ?author ?lastName ?foreName (COUNT(?article) AS ?articleCount)
 WHERE {
-    ?article a pkg:Article .
-    ?article pkg:mentionsBioEntity ?gene .
-    ?gene a pkg:Gene .
-    OPTIONAL { ?gene pkg:entityName ?geneName }
+    ?author a pkg:Author .
+    ?author pkg:lastName ?lastName .
+    OPTIONAL { ?author pkg:foreName ?foreName }
+    ?article pkg:writtenBy ?author .
 }
+GROUP BY ?author ?lastName ?foreName
+ORDER BY DESC(?articleCount)
 LIMIT 50
 \end{lstlisting}
 
-\subsection{Query 3: Author Collaboration Network}
-
-\begin{lstlisting}[language=SPARQL, caption=Collaboration Query]
+\subsubsection{CQ3: Author Collaboration Network}
+\begin{lstlisting}[language=SPARQL, caption=CQ3: Frequent Collaborators]
 PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
 
 SELECT ?author1 ?author2 (COUNT(?article) AS ?collaborations)
@@ -636,16 +698,216 @@ WHERE {
     ?article a pkg:Article .
     ?article pkg:writtenBy ?author1 .
     ?article pkg:writtenBy ?author2 .
-    FILTER (?author1 < ?author2)
+    FILTER (STR(?author1) < STR(?author2))
 }
 GROUP BY ?author1 ?author2
+HAVING (COUNT(?article) > 1)
 ORDER BY DESC(?collaborations)
+LIMIT 100
+\end{lstlisting}
+
+\subsection{Article \& Bio-Entity Queries (CQ4-CQ7)}
+
+\subsubsection{CQ4: Articles Mentioning Genes}
+\begin{lstlisting}[language=SPARQL, caption=CQ4: Articles with Gene Mentions]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+
+SELECT ?article ?pmid ?entityName
+WHERE {
+    ?article a pkg:Article .
+    ?article pkg:hasPMID ?pmid .
+    ?article pkg:mentionsBioEntity ?entity .
+    ?entity a pkg:Gene .
+    ?entity pkg:entityName ?entityName .
+}
+LIMIT 100
+\end{lstlisting}
+
+\subsubsection{CQ5: Articles Mentioning Species}
+\begin{lstlisting}[language=SPARQL, caption=CQ5: Species-Related Articles]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+
+SELECT ?article ?pmid ?speciesName
+WHERE {
+    ?article a pkg:Article .
+    ?article pkg:hasPMID ?pmid .
+    ?article pkg:mentionsBioEntity ?entity .
+    ?entity a pkg:Species .
+    OPTIONAL { ?entity pkg:entityName ?speciesName }
+}
+LIMIT 100
+\end{lstlisting}
+
+\subsubsection{CQ6: Gene-Mutation Correlations}
+\begin{lstlisting}[language=SPARQL, caption=CQ6: Articles with Genes AND Mutations]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+
+SELECT ?article ?pmid ?geneName ?mutationName
+WHERE {
+    ?article a pkg:Article .
+    ?article pkg:hasPMID ?pmid .
+    ?article pkg:mentionsBioEntity ?g .
+    ?g a pkg:Gene .
+    OPTIONAL { ?g pkg:entityName ?geneName }
+    ?article pkg:mentionsBioEntity ?m .
+    ?m a pkg:Mutation .
+    OPTIONAL { ?m pkg:entityName ?mutationName }
+}
+LIMIT 100
+\end{lstlisting}
+
+\subsubsection{CQ7: Bio-Entity Type Distribution}
+\begin{lstlisting}[language=SPARQL, caption=CQ7: Entity Type Statistics]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+
+SELECT ?entityType (COUNT(?entity) AS ?count)
+WHERE {
+    ?entity a pkg:BioEntity .
+    ?entity pkg:entityType ?entityType .
+}
+GROUP BY ?entityType
+ORDER BY DESC(?count)
+\end{lstlisting}
+
+\subsection{Organization \& Affiliation Queries (CQ8-CQ9)}
+
+\subsubsection{CQ8: Top Organizations by Author Count}
+\begin{lstlisting}[language=SPARQL, caption=CQ8: Organizations with Most Authors]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+
+SELECT ?org (COUNT(DISTINCT ?author) AS ?authorCount)
+WHERE {
+    ?author a pkg:Author .
+    ?author pkg:hasAffiliation ?aff .
+    ?aff pkg:affiliatedWith ?org .
+}
+GROUP BY ?org
+ORDER BY DESC(?authorCount)
 LIMIT 50
 \end{lstlisting}
 
-\subsection{Query 4: Federated Query to DBpedia}
+\subsubsection{CQ9: Affiliations by Country}
+\begin{lstlisting}[language=SPARQL, caption=CQ9: Country Distribution]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
 
-\begin{lstlisting}[language=SPARQL, caption=Federated Query]
+SELECT ?country (COUNT(?aff) AS ?affiliationCount)
+WHERE {
+    ?aff a pkg:Affiliation .
+    ?aff pkg:country ?country .
+}
+GROUP BY ?country
+ORDER BY DESC(?affiliationCount)
+LIMIT 30
+\end{lstlisting}
+
+\subsection{Employment \& Education Queries (CQ10-CQ12)}
+
+\subsubsection{CQ10: Top Education Institutions}
+\begin{lstlisting}[language=SPARQL, caption=CQ10: Institutions with Most Alumni]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+
+SELECT ?institution (COUNT(DISTINCT ?author) AS ?authorCount)
+WHERE {
+    ?author a pkg:Author .
+    ?author pkg:hasEducation ?edu .
+    ?edu pkg:educatedAt ?institution .
+}
+GROUP BY ?institution
+ORDER BY DESC(?authorCount)
+LIMIT 50
+\end{lstlisting}
+
+\subsubsection{CQ11: Employment Timeline}
+\begin{lstlisting}[language=SPARQL, caption=CQ11: Career History]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+
+SELECT ?author ?lastName ?org ?startYear ?endYear
+WHERE {
+    ?author a pkg:Author .
+    ?author pkg:lastName ?lastName .
+    ?author pkg:hasEmployment ?emp .
+    ?emp pkg:employedAt ?org .
+    OPTIONAL { ?emp pkg:startYear ?startYear }
+    OPTIONAL { ?emp pkg:endYear ?endYear }
+}
+ORDER BY ?author ?startYear
+LIMIT 100
+\end{lstlisting}
+
+\subsubsection{CQ12: Authors with Education Records}
+\begin{lstlisting}[language=SPARQL, caption=CQ12: Authors with Education Information]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+
+SELECT ?author ?lastName ?institution
+WHERE {
+    ?author a pkg:Author .
+    OPTIONAL { ?author pkg:lastName ?lastName }
+    ?author pkg:hasEducation ?edu .
+    ?edu pkg:educatedAt ?institution .
+}
+LIMIT 100
+\end{lstlisting}
+
+\subsection{NIH Project Queries (CQ13-CQ14)}
+
+\subsubsection{CQ13: Authors with NIH Funding}
+\begin{lstlisting}[language=SPARQL, caption=CQ13: Funded Authors]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+
+SELECT ?author ?lastName ?projectNumber ?piName
+WHERE {
+    ?author a pkg:Author .
+    ?author pkg:lastName ?lastName .
+    ?author pkg:hasProject ?project .
+    ?project pkg:projectNumber ?projectNumber .
+    OPTIONAL { ?project pkg:piName ?piName }
+}
+LIMIT 100
+\end{lstlisting}
+
+\subsubsection{CQ14: Principal Investigators}
+\begin{lstlisting}[language=SPARQL, caption=CQ14: PIs by Project Count]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+
+SELECT ?piName (COUNT(DISTINCT ?project) AS ?projectCount)
+WHERE {
+    ?project a pkg:NIHProject .
+    ?project pkg:piName ?piName .
+}
+GROUP BY ?piName
+ORDER BY DESC(?projectCount)
+LIMIT 50
+\end{lstlisting}
+
+\subsection{Complex Analytical Query (CQ15)}
+
+\subsubsection{CQ15: Complete Author Profile}
+\begin{lstlisting}[language=SPARQL, caption=CQ15: Full Author Profile with All Relationships]
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+
+SELECT ?author ?lastName ?foreName ?org ?institution 
+       ?project ?article
+WHERE {
+    ?author a pkg:Author .
+    ?author pkg:lastName ?lastName .
+    OPTIONAL { ?author pkg:foreName ?foreName }
+    OPTIONAL {
+        ?author pkg:hasAffiliation ?aff .
+        ?aff pkg:affiliatedWith ?org .
+    }
+    OPTIONAL {
+        ?author pkg:hasEducation ?edu .
+        ?edu pkg:educatedAt ?institution .
+    }
+    OPTIONAL { ?author pkg:hasProject ?project . }
+    OPTIONAL { ?article pkg:writtenBy ?author . }
+}
+LIMIT 50
+\end{lstlisting}
+
+\subsection{Federated Query to External Knowledge Bases}
+
+\begin{lstlisting}[language=SPARQL, caption=Federated Query to DBpedia]
 PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
 PREFIX dbo: <http://dbpedia.org/ontology/>
 
@@ -663,7 +925,7 @@ LIMIT 10
 \end{lstlisting}
 
 %==============================================================================
-\section{Web Application (BONUS)}
+\section{Web Application}
 %==============================================================================
 
 \subsection{Application Overview}
@@ -760,56 +1022,192 @@ As per the rubric requirement, we submit:
 \section{Visualization}
 %==============================================================================
 
-\subsection{Ontology Class Hierarchy}
+\subsection{Complete Ontology Schema (All 23 Classes)}
 
-Figure \ref{fig:class-hierarchy} shows the class hierarchy of our ontology with 23 classes.
+Figure \ref{fig:full-ontology} shows the complete ontology schema with all 23 classes organized by category, including object property relationships.
 
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[
-    node distance=0.8cm,
-    every node/.style={draw, rounded corners, minimum width=2cm, minimum height=0.6cm, font=\small},
-    core/.style={fill=red!20},
-    bio/.style={fill=green!20},
-    career/.style={fill=blue!20},
-    defined/.style={fill=yellow!20}
+    scale=0.85,
+    transform shape,
+    node distance=0.6cm,
+    class/.style={draw, rounded corners, minimum width=1.8cm, minimum height=0.5cm, font=\scriptsize, align=center},
+    core/.style={class, fill=red!15},
+    bio/.style={class, fill=green!15},
+    career/.style={class, fill=blue!15},
+    defined/.style={class, fill=yellow!15},
+    enum/.style={class, fill=purple!15},
+    prop/.style={->, thick, font=\tiny}
 ]
-    % Core classes
-    \node[core] (thing) {owl:Thing};
+    % === CORE CLASSES ===
+    \node[core] (article) at (0,0) {Article};
+    \node[core] (author) at (4,0) {Author};
+    \node[core] (authorship) at (2,-1.5) {Authorship};
     
-    \node[core, below left=1cm and 2cm of thing] (article) {Article};
-    \node[core, below=1cm of thing] (author) {Author};
-    \node[core, below right=1cm and 2cm of thing] (org) {Organization};
+    % === ORGANIZATIONAL ===
+    \node[career] (org) at (8,0) {Organization};
+    \node[career] (inst) at (8,-2) {Institution};
+    \node[career] (aff) at (6,-1.5) {Affiliation};
     
-    % Bio entities
-    \node[bio, below left=0.8cm and 0.5cm of article] (bioent) {BioEntity};
-    \node[bio, below left=0.6cm and -0.3cm of bioent] (gene) {Gene};
-    \node[bio, below=0.6cm of bioent] (disease) {Disease};
-    \node[bio, below right=0.6cm and -0.3cm of bioent] (mutation) {Mutation};
+    % === CAREER ===
+    \node[career] (emp) at (4,-3) {Employment};
+    \node[career] (edu) at (6,-3) {Education};
     
-    % Career classes
-    \node[career, below left=0.8cm and -0.5cm of author] (emp) {Employment};
-    \node[career, below right=0.8cm and -0.5cm of author] (edu) {Education};
-    \node[career, below=1.5cm of author] (aff) {Affiliation};
+    % === FUNDING ===
+    \node[career] (nih) at (4,-4.5) {NIHProject};
     
-    % Defined classes
-    \node[defined, right=0.5cm of author] (active) {ActiveAuthor};
-    \node[defined, below=0.5cm of active] (anon) {AnonymousAuthor};
+    % === BIO-ENTITIES ===
+    \node[bio] (bioent) at (-2,-1.5) {BioEntity};
+    \node[bio] (gene) at (-4,-2.5) {Gene};
+    \node[bio] (disease) at (-3,-3.5) {Disease};
+    \node[bio] (chemical) at (-2,-2.5) {Chemical};
+    \node[bio] (species) at (-1,-3.5) {Species};
+    \node[bio] (mutation) at (0,-2.5) {Mutation};
     
-    % Edges
-    \draw[->] (article) -- (thing);
-    \draw[->] (author) -- (thing);
-    \draw[->] (org) -- (thing);
-    \draw[->] (bioent) -- (thing);
-    \draw[->] (gene) -- (bioent);
-    \draw[->] (disease) -- (bioent);
-    \draw[->] (mutation) -- (bioent);
-    \draw[->] (active) -- (author);
-    \draw[->] (anon) -- (author);
+    % === DEFINED CLASSES ===
+    \node[defined] (active) at (2,1.5) {ActiveAuthor};
+    \node[defined] (anon) at (4,1.5) {AnonymousAuthor};
+    \node[defined] (prolific) at (6,1.5) {ProlificAuthor};
+    \node[defined] (single) at (-1,1.5) {SingleAuthorArticle};
+    \node[defined] (multi) at (1,1.5) {MultiAuthorArticle};
+    
+    % === ENUMERATION ===
+    \node[enum] (status) at (-2,0) {PublicationStatus};
+    
+    % === RELATIONSHIPS ===
+    \draw[prop] (article) -- node[above] {writtenBy} (author);
+    \draw[prop] (article) -- node[left] {hasAuthorship} (authorship);
+    \draw[prop] (authorship) -- node[right] {refersToAuthor} (author);
+    \draw[prop] (article) -- node[above] {mentionsBioEntity} (bioent);
+    \draw[prop] (article) -- node[above] {hasStatus} (status);
+    
+    \draw[prop] (author) -- node[above] {hasAffiliation} (aff);
+    \draw[prop] (aff) -- node[above] {affiliatedWith} (org);
+    \draw[prop] (author) -- node[left] {hasEmployment} (emp);
+    \draw[prop] (emp) -- node[below] {employedAt} (org);
+    \draw[prop] (author) -- node[right] {hasEducation} (edu);
+    \draw[prop] (edu) -- node[below] {educatedAt} (inst);
+    \draw[prop] (author) -- node[left] {hasProject} (nih);
+    
+    % Subclass arrows
+    \draw[->, dashed] (gene) -- (bioent);
+    \draw[->, dashed] (disease) -- (bioent);
+    \draw[->, dashed] (chemical) -- (bioent);
+    \draw[->, dashed] (species) -- (bioent);
+    \draw[->, dashed] (mutation) -- (bioent);
+    
+    \draw[->, dashed] (active) -- (author);
+    \draw[->, dashed] (anon) -- (author);
+    \draw[->, dashed] (prolific) -- (author);
+    \draw[->, dashed] (single) -- (article);
+    \draw[->, dashed] (multi) -- (article);
+    
+    % Legend
+    \node[core, minimum width=1cm] at (-4,1.5) {};
+    \node[right, font=\tiny] at (-3.3,1.5) {Core};
+    \node[bio, minimum width=1cm] at (-4,1) {};
+    \node[right, font=\tiny] at (-3.3,1) {Bio-Entity};
+    \node[career, minimum width=1cm] at (-4,0.5) {};
+    \node[right, font=\tiny] at (-3.3,0.5) {Career/Org};
+    \node[defined, minimum width=1cm] at (-4,0) {};
+    \node[right, font=\tiny] at (-3.3,0) {Defined};
+    \node[enum, minimum width=1cm] at (-4,-0.5) {};
+    \node[right, font=\tiny] at (-3.3,-0.5) {Enum};
     
 \end{tikzpicture}
-\caption{Ontology Class Hierarchy (Partial View)}
-\label{fig:class-hierarchy}
+\caption{Complete PKG2020 Ontology Schema with 23 Classes and Object Properties}
+\label{fig:full-ontology}
+\end{figure}
+
+\subsection{RDF Triple Pattern (Subject-Predicate-Object)}
+
+Figure \ref{fig:rdf-triple} illustrates the RDF triple pattern used throughout our knowledge graph.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=3cm,
+    entity/.style={draw, circle, fill=blue!20, minimum size=1.5cm, font=\small},
+    literal/.style={draw, rectangle, fill=orange!20, minimum width=2cm, minimum height=0.8cm, font=\small},
+    pred/.style={->, thick, font=\small}
+]
+    % Example 1: Article -> writtenBy -> Author
+    \node[entity] (art1) at (0,0) {Article\_123};
+    \node[entity] (auth1) at (4,0) {Author\_456};
+    \draw[pred] (art1) -- node[above] {pkg:writtenBy} (auth1);
+    
+    % Example 2: Author -> lastName -> "Smith"
+    \node[entity] (auth2) at (8,0) {Author\_456};
+    \node[literal] (name) at (12,0) {"Smith"};
+    \draw[pred] (auth2) -- node[above] {pkg:lastName} (name);
+    
+    % Example 3: Article -> mentionsBioEntity -> Gene
+    \node[entity] (art2) at (0,-2.5) {Article\_123};
+    \node[entity] (gene1) at (4,-2.5) {Gene\_BRCA1};
+    \draw[pred] (art2) -- node[above] {pkg:mentionsBioEntity} (gene1);
+    
+    % Example 4: Author -> hasAffiliation -> Affiliation -> affiliatedWith -> Org
+    \node[entity] (auth3) at (8,-2.5) {Author\_456};
+    \node[entity] (aff1) at (11,-2.5) {Aff\_789};
+    \node[entity] (org1) at (14,-2.5) {Org\_MIT};
+    \draw[pred] (auth3) -- node[above] {hasAffiliation} (aff1);
+    \draw[pred] (aff1) -- node[above] {affiliatedWith} (org1);
+    
+\end{tikzpicture}
+\caption{RDF Triple Pattern Examples: Subject $\rightarrow$ Predicate $\rightarrow$ Object}
+\label{fig:rdf-triple}
+\end{figure}
+
+\subsection{Sample Knowledge Graph Visualization}
+
+Figure \ref{fig:sample-kg} shows a sample subgraph from our knowledge graph demonstrating the interconnected nature of the data.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    scale=0.9,
+    transform shape,
+    node distance=1.5cm,
+    article/.style={draw, circle, fill=red!30, minimum size=1cm, font=\tiny},
+    author/.style={draw, circle, fill=blue!30, minimum size=1cm, font=\tiny},
+    bio/.style={draw, circle, fill=green!30, minimum size=0.8cm, font=\tiny},
+    org/.style={draw, circle, fill=purple!30, minimum size=0.8cm, font=\tiny},
+    edge/.style={->, thick, font=\tiny}
+]
+    % Central article
+    \node[article] (art) at (0,0) {Article};
+    
+    % Authors
+    \node[author] (a1) at (-2,1.5) {Author1};
+    \node[author] (a2) at (2,1.5) {Author2};
+    \node[author] (a3) at (0,2.5) {Author3};
+    
+    % Bio-entities
+    \node[bio] (g1) at (-3,-1) {Gene1};
+    \node[bio] (d1) at (0,-2) {Disease1};
+    \node[bio] (m1) at (3,-1) {Mutation1};
+    
+    % Organizations
+    \node[org] (o1) at (-4,0.5) {Harvard};
+    \node[org] (o2) at (4,0.5) {MIT};
+    
+    % Article relationships
+    \draw[edge] (art) -- node[left] {writtenBy} (a1);
+    \draw[edge] (art) -- node[right] {writtenBy} (a2);
+    \draw[edge] (art) -- node[right] {writtenBy} (a3);
+    \draw[edge] (art) -- node[left] {mentions} (g1);
+    \draw[edge] (art) -- node[below] {mentions} (d1);
+    \draw[edge] (art) -- node[right] {mentions} (m1);
+    
+    % Author relationships
+    \draw[edge, dashed] (a1) -- node[above] {affiliation} (o1);
+    \draw[edge, dashed] (a2) -- node[above] {affiliation} (o2);
+    \draw[edge, dashed, bend left] (a1) to node[above] {collaborates} (a2);
+    
+\end{tikzpicture}
+\caption{Sample Knowledge Graph: Article with Authors, Bio-Entities, and Affiliations}
+\label{fig:sample-kg}
 \end{figure}
 
 \subsection{Knowledge Graph Statistics}
@@ -952,8 +1350,8 @@ This project successfully converted the PKG2020S4 bibliometric dataset into a co
     \item \textbf{Data Population}: Modular Python pipeline for 7 CSV files
     \item \textbf{Reasoning}: Consistency checking and classification
     \item \textbf{External Linking}: 5-star linked data with DBpedia/Wikidata
-    \item \textbf{SPARQL Queries}: 7 competency questions answered
-    \item \textbf{BONUS}: Interactive web application
+    \item \textbf{SPARQL Queries}: 15 competency questions answered
+    \item \textbf{Web Application}: Interactive web application for exploring the knowledge graph
 \end{enumerate}
 
 The project demonstrates the practical application of knowledge representation and reasoning concepts learned in the course.

@@ -199,82 +199,115 @@ def sparql_endpoint():
         return jsonify({"error": "Query execution failed"}), 500
 
 # ============================================================
-# COMPETENCY QUERIES (12 Queries)
+# COMPETENCY QUERIES (15 Validated Queries)
 # ============================================================
 COMPETENCY_QUERIES = {
     "cq1": {
-        "title": "1. Authors with Multiple Institutions",
-        "description": "Which authors have published in multiple institutions?",
+        "title": "CQ1: Authors at Multiple Institutions",
+        "description": "Which authors have worked in multiple institutions?",
         "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
-SELECT ?author (COUNT(DISTINCT ?org) AS ?orgCount)
+SELECT ?author ?lastName (COUNT(DISTINCT ?org) AS ?orgCount)
 WHERE {
     ?author a pkg:Author .
+    ?author pkg:lastName ?lastName .
     ?author pkg:hasAffiliation ?aff .
     ?aff pkg:affiliatedWith ?org .
 }
-GROUP BY ?author
+GROUP BY ?author ?lastName
 HAVING (COUNT(DISTINCT ?org) > 1)
 ORDER BY DESC(?orgCount)
-LIMIT 20"""
+LIMIT 30"""
     },
     "cq2": {
-        "title": "2. Articles Mentioning Genes",
-        "description": "Which articles mention specific bio-entities (genes)?",
+        "title": "CQ2: Most Prolific Authors",
+        "description": "Who are the most prolific authors by article count?",
         "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
-SELECT ?article ?pmid ?gene ?geneName
+SELECT ?author ?lastName (COUNT(?article) AS ?articleCount)
 WHERE {
-    ?article a pkg:Article .
-    ?article pkg:hasPMID ?pmid .
-    ?article pkg:mentionsBioEntity ?gene .
-    ?gene a pkg:Gene .
-    OPTIONAL { ?gene pkg:entityName ?geneName }
+    ?author a pkg:Author .
+    OPTIONAL { ?author pkg:lastName ?lastName }
+    ?article pkg:writtenBy ?author .
 }
-LIMIT 50"""
+GROUP BY ?author ?lastName
+ORDER BY DESC(?articleCount)
+LIMIT 30"""
     },
     "cq3": {
-        "title": "3. Author Collaborations",
-        "description": "Which authors have collaborated on joint publications?",
+        "title": "CQ3: Author Collaborations",
+        "description": "Which authors frequently collaborate together?",
         "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
 SELECT ?author1 ?author2 (COUNT(?article) AS ?collaborations)
 WHERE {
     ?article a pkg:Article .
     ?article pkg:writtenBy ?author1 .
     ?article pkg:writtenBy ?author2 .
-    FILTER (str(?author1) < str(?author2))
+    FILTER (STR(?author1) < STR(?author2))
 }
 GROUP BY ?author1 ?author2
 ORDER BY DESC(?collaborations)
 LIMIT 30"""
     },
     "cq4": {
-        "title": "4. Authors with NIH Funding",
-        "description": "Which authors have NIH funding?",
+        "title": "CQ4: Articles with Genes",
+        "description": "Which articles mention specific genes?",
         "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
-SELECT ?author ?project ?projectNumber
+SELECT ?article ?pmid ?entityName
 WHERE {
-    ?author a pkg:Author .
-    ?author pkg:hasProject ?project .
-    ?project pkg:projectNumber ?projectNumber .
+    ?article a pkg:Article .
+    ?article pkg:hasPMID ?pmid .
+    ?article pkg:mentionsBioEntity ?entity .
+    ?entity a pkg:Gene .
+    OPTIONAL { ?entity pkg:entityName ?entityName }
 }
 LIMIT 50"""
     },
     "cq5": {
-        "title": "5. Prolific Authors",
-        "description": "Most prolific authors by article count",
+        "title": "CQ5: Articles with Species",
+        "description": "Which articles mention species?",
         "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
-SELECT ?author ?lastName (COUNT(?article) AS ?articleCount)
+SELECT ?article ?pmid ?speciesName
 WHERE {
     ?article a pkg:Article .
-    ?article pkg:writtenBy ?author .
-    OPTIONAL { ?author pkg:lastName ?lastName }
+    ?article pkg:hasPMID ?pmid .
+    ?article pkg:mentionsBioEntity ?entity .
+    ?entity a pkg:Species .
+    OPTIONAL { ?entity pkg:entityName ?speciesName }
 }
-GROUP BY ?author ?lastName
-ORDER BY DESC(?articleCount)
-LIMIT 20"""
+LIMIT 50"""
     },
     "cq6": {
-        "title": "6. Top Organizations",
-        "description": "Organizations with most affiliated authors",
+        "title": "CQ6: Gene-Mutation Correlations",
+        "description": "Which articles mention both genes and mutations?",
+        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT ?article ?pmid ?geneName ?mutationName
+WHERE {
+    ?article a pkg:Article .
+    ?article pkg:hasPMID ?pmid .
+    ?article pkg:mentionsBioEntity ?g .
+    ?g a pkg:Gene .
+    OPTIONAL { ?g pkg:entityName ?geneName }
+    ?article pkg:mentionsBioEntity ?m .
+    ?m a pkg:Mutation .
+    OPTIONAL { ?m pkg:entityName ?mutationName }
+}
+LIMIT 50"""
+    },
+    "cq7": {
+        "title": "CQ7: Entity Type Distribution",
+        "description": "What is the distribution of entity types?",
+        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT ?type (COUNT(?entity) AS ?count)
+WHERE {
+    ?entity rdf:type ?type .
+    FILTER(STRSTARTS(STR(?type), "http://example.org/pkg2020/"))
+}
+GROUP BY ?type
+ORDER BY DESC(?count)"""
+    },
+    "cq8": {
+        "title": "CQ8: Top Organizations",
+        "description": "Which organizations have the most affiliated authors?",
         "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
 SELECT ?org (COUNT(DISTINCT ?author) AS ?authorCount)
 WHERE {
@@ -284,85 +317,106 @@ WHERE {
 }
 GROUP BY ?org
 ORDER BY DESC(?authorCount)
-LIMIT 20"""
-    },
-    "cq7": {
-        "title": "7. Articles with Mutations",
-        "description": "Articles mentioning mutations",
-        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
-SELECT ?article ?pmid ?mutation ?mutationName
-WHERE {
-    ?article a pkg:Article .
-    ?article pkg:hasPMID ?pmid .
-    ?article pkg:mentionsBioEntity ?mutation .
-    ?mutation a pkg:Mutation .
-    OPTIONAL { ?mutation pkg:entityName ?mutationName }
-}
-LIMIT 50"""
-    },
-    "cq8": {
-        "title": "8. Dataset Statistics",
-        "description": "Count of all entity types in the knowledge graph",
-        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
-SELECT ?class (COUNT(?instance) AS ?count)
-WHERE {
-    ?instance a ?class .
-    FILTER(STRSTARTS(STR(?class), "http://example.org/pkg2020/"))
-}
-GROUP BY ?class
-ORDER BY DESC(?count)"""
+LIMIT 30"""
     },
     "cq9": {
-        "title": "9. All Classes in Ontology",
-        "description": "List all classes defined in the ontology",
-        "query": """PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
-SELECT DISTINCT ?class
+        "title": "CQ9: Affiliations by Country",
+        "description": "How are author affiliations distributed by country?",
+        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT ?country (COUNT(?aff) AS ?affiliationCount)
 WHERE {
-    { ?class a owl:Class } UNION { ?class a rdfs:Class }
-    FILTER(STRSTARTS(STR(?class), "http://example.org/pkg2020/"))
+    ?aff a pkg:Affiliation .
+    ?aff pkg:country ?country .
 }
-ORDER BY ?class"""
+GROUP BY ?country
+ORDER BY DESC(?affiliationCount)
+LIMIT 30"""
     },
     "cq10": {
-        "title": "10. Sample Graph Triples",
-        "description": "Sample triples from the dataset",
+        "title": "CQ10: Top Education Institutions",
+        "description": "Which institutions produced the most researchers?",
         "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
-SELECT ?subject ?predicate ?object
+SELECT ?institution (COUNT(DISTINCT ?author) AS ?authorCount)
 WHERE {
-    ?subject ?predicate ?object .
-    FILTER(STRSTARTS(STR(?subject), "http://example.org/pkg2020/"))
+    ?author a pkg:Author .
+    ?author pkg:hasEducation ?edu .
+    ?edu pkg:educatedAt ?institution .
 }
-LIMIT 100"""
+GROUP BY ?institution
+ORDER BY DESC(?authorCount)
+LIMIT 30"""
     },
     "cq11": {
-        "title": "11. Diseases in Articles",
-        "description": "Articles mentioning diseases",
+        "title": "CQ11: Employment Timeline",
+        "description": "What is the career timeline of researchers?",
         "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
-SELECT ?article ?pmid ?disease ?diseaseName
+SELECT ?author ?lastName ?org ?startYear ?endYear
 WHERE {
-    ?article a pkg:Article .
-    ?article pkg:hasPMID ?pmid .
-    ?article pkg:mentionsBioEntity ?disease .
-    ?disease a pkg:Disease .
-    OPTIONAL { ?disease pkg:entityName ?diseaseName }
+    ?author a pkg:Author .
+    OPTIONAL { ?author pkg:lastName ?lastName }
+    ?author pkg:hasEmployment ?emp .
+    ?emp pkg:employedAt ?org .
+    OPTIONAL { ?emp pkg:startYear ?startYear }
+    OPTIONAL { ?emp pkg:endYear ?endYear }
 }
 LIMIT 50"""
     },
     "cq12": {
-        "title": "12. Author Education",  
-        "description": "Authors with their education records",
+        "title": "CQ12: Authors with Education",
+        "description": "Which authors have education records?",
         "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
-SELECT ?author ?lastName ?degree ?institution
+SELECT ?author ?lastName ?institution
 WHERE {
     ?author a pkg:Author .
-    ?author pkg:lastName ?lastName .
+    OPTIONAL { ?author pkg:lastName ?lastName }
     ?author pkg:hasEducation ?edu .
-    ?edu pkg:degree ?degree .
     ?edu pkg:educatedAt ?institution .
 }
 LIMIT 50"""
+    },
+    "cq13": {
+        "title": "CQ13: NIH Funded Authors",
+        "description": "Which authors have NIH project funding?",
+        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT ?author ?lastName ?projectNumber ?piName
+WHERE {
+    ?author a pkg:Author .
+    OPTIONAL { ?author pkg:lastName ?lastName }
+    ?author pkg:hasProject ?project .
+    OPTIONAL { ?project pkg:projectNumber ?projectNumber }
+    OPTIONAL { ?project pkg:piName ?piName }
+}
+LIMIT 50"""
+    },
+    "cq14": {
+        "title": "CQ14: Principal Investigators",
+        "description": "Who are the principal investigators?",
+        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT ?project ?piName ?projectNumber
+WHERE {
+    ?project a pkg:NIHProject .
+    OPTIONAL { ?project pkg:piName ?piName }
+    OPTIONAL { ?project pkg:projectNumber ?projectNumber }
+}
+LIMIT 50"""
+    },
+    "cq15": {
+        "title": "CQ15: Complete Author Profile",
+        "description": "Get complete author profile with all relationships",
+        "query": """PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT ?author ?lastName ?foreName ?article ?org ?project
+WHERE {
+    ?author a pkg:Author .
+    OPTIONAL { ?author pkg:lastName ?lastName }
+    OPTIONAL { ?author pkg:foreName ?foreName }
+    OPTIONAL { ?article pkg:writtenBy ?author }
+    OPTIONAL {
+        ?author pkg:hasAffiliation ?aff .
+        ?aff pkg:affiliatedWith ?org .
+    }
+    OPTIONAL { ?author pkg:hasProject ?project }
+}
+LIMIT 30"""
     }
 }
 

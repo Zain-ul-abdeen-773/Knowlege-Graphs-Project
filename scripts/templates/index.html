@@ -8,15 +8,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-light: #3b82f6;
-            --secondary: #1e40af;
-            --accent: #0891b2;
-            --bg-dark: #f8fafc;
-            --bg-card: #ffffff;
-            --text: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
+            --primary: #00ff41;
+            --primary-light: #39ff14;
+            --secondary: #00cc33;
+            --accent: #00ffcc;
+            --bg-dark: #0a0a0a;
+            --bg-card: #111111;
+            --text: #00ff41;
+            --text-muted: #00aa33;
+            --border: #1a1a1a;
+            --glow: 0 0 10px rgba(0, 255, 65, 0.5);
         }
         
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -97,13 +98,15 @@
         }
         
         .nav-tab:hover {
-            background: #f1f5f9;
-            color: var(--text);
+            background: #1a1a1a;
+            color: var(--primary);
+            text-shadow: var(--glow);
         }
         
         .nav-tab.active {
             background: var(--primary);
-            color: white;
+            color: #000;
+            text-shadow: none;
         }
         
         /* Container */
@@ -151,8 +154,8 @@
         
         .stat-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-color: var(--primary-light);
+            box-shadow: var(--glow);
+            border-color: var(--primary);
         }
         
         .stat-card h3 {
@@ -207,20 +210,20 @@
         .query-editor {
             width: 100%;
             min-height: 200px;
-            background: #1e293b;
-            border: 1px solid var(--border);
+            background: #0a0a0a;
+            border: 1px solid var(--primary);
             border-radius: 8px;
             padding: 1rem;
-            color: #e2e8f0;
-            font-family: 'Consolas', 'Monaco', monospace;
+            color: var(--primary);
+            font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
             font-size: 0.875rem;
             resize: vertical;
         }
         
         .query-editor:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: var(--primary-light);
+            box-shadow: var(--glow);
         }
         
         /* Buttons */
@@ -236,22 +239,24 @@
         
         .btn-primary {
             background: var(--primary);
-            color: white;
+            color: #000;
+            font-weight: 700;
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(233,69,96,0.3);
+            box-shadow: var(--glow);
+            background: var(--primary-light);
         }
         
         .btn-secondary {
-            background: rgba(255,255,255,0.1);
-            color: var(--text);
-            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
         }
         
         .btn-secondary:hover {
-            background: #e2e8f0;
+            background: rgba(0, 255, 65, 0.1);
         }
         
         /* Select Dropdown */
@@ -262,9 +267,9 @@
         select {
             padding: 0.625rem 1rem;
             border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--bg-card);
-            color: var(--text);
+            border: 1px solid var(--primary);
+            background: #0a0a0a;
+            color: var(--primary);
             font-size: 0.875rem;
             min-width: 250px;
             cursor: pointer;
@@ -272,8 +277,8 @@
         
         select:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: var(--primary-light);
+            box-shadow: var(--glow);
         }
         
         /* Results Table */
@@ -292,9 +297,9 @@
         }
         
         .results-table th {
-            background: #f1f5f9;
+            background: #1a1a1a;
             font-weight: 600;
-            color: var(--text);
+            color: var(--primary);
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -568,7 +573,7 @@
         <!-- Competency Queries Tab -->
         <div id="competency" class="tab-content">
             <div class="panel">
-                <h3 class="panel-title">📝 Competency Questions (10 Queries)</h3>
+                <h3 class="panel-title">📝 Competency Questions (15 Queries)</h3>
                 <p style="color: var(--text-muted); margin-bottom: 1rem;">
                     Click on any question to execute the corresponding SPARQL query.
                 </p>
