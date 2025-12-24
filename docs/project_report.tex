@@ -218,45 +218,107 @@ CQ15 & Get the complete profile of an author (all relationships)? & Complex \\
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[
-    node distance=1.5cm,
-    class/.style={rectangle, draw, fill=blue!20, text width=2.5cm, text centered, rounded corners, minimum height=1cm},
+    scale=0.8,
+    transform shape,
+    node distance=2cm,
+    class/.style={rectangle, draw, fill=blue!20, text width=2cm, text centered, rounded corners, minimum height=0.8cm, font=\scriptsize},
     property/.style={->, thick}
 ]
-    % Core entities
-    \node[class] (article) {Article\\{\scriptsize hasPMID}};
-    \node[class, right=of article] (author) {Author\\{\scriptsize AND\_ID}};
-    \node[class, below=of article] (authorship) {Authorship\\{\scriptsize authorOrder}};
+    % Row 1: Core
+    \node[class] (bio) at (0,0) {BioEntity};
+    \node[class] (article) at (3,0) {Article};
+    \node[class] (author) at (6,0) {Author};
+    \node[class] (org) at (9,0) {Organization};
     
-    % Organizational
-    \node[class, right=of author] (org) {Organization};
-    \node[class, below=of author] (aff) {Affiliation\\{\scriptsize city, country}};
+    % Row 2: Supporting
+    \node[class] (nih) at (0,-2) {NIHProject};
+    \node[class] (authorship) at (3,-2) {Authorship};
+    \node[class] (aff) at (6,-2) {Affiliation};
+    \node[class] (inst) at (9,-2) {Institution};
     
-    % Career
-    \node[class, below=of org] (emp) {Employment\\{\scriptsize startYear}};
-    \node[class, right=of org] (inst) {Institution};
-    \node[class, below=of inst] (edu) {Education\\{\scriptsize degree}};
-    
-    % Bio
-    \node[class, left=of article] (bio) {BioEntity};
-    \node[class, below=of bio] (nih) {NIHProject};
+    % Row 3: Career
+    \node[class] (emp) at (4.5,-4) {Employment};
+    \node[class] (edu) at (7.5,-4) {Education};
     
     % Relationships
-    \draw[property] (article) -- node[above] {\scriptsize writtenBy} (author);
-    \draw[property] (article) -- node[left] {\scriptsize hasAuthorship} (authorship);
-    \draw[property] (authorship) -- node[below] {\scriptsize refersToAuthor} (author);
-    \draw[property] (author) -- node[above] {\scriptsize hasAffiliation} (aff);
-    \draw[property] (aff) -- node[right] {\scriptsize affiliatedWith} (org);
-    \draw[property] (author) -- node[above] {\scriptsize hasEmployment} (emp);
-    \draw[property] (emp) -- node[above] {\scriptsize employedAt} (org);
-    \draw[property] (author) -- node[above] {\scriptsize hasEducation} (edu);
-    \draw[property] (edu) -- node[above] {\scriptsize educatedAt} (inst);
-    \draw[property] (article) -- node[above] {\scriptsize mentionsBioEntity} (bio);
-    \draw[property] (author) -- node[left] {\scriptsize hasProject} (nih);
+    \draw[property] (article) -- node[above, font=\tiny] {writtenBy} (author);
+    \draw[property] (article) -- node[left, font=\tiny] {hasAuthorship} (authorship);
+    \draw[property] (article) -- node[above, font=\tiny] {mentionsBioEntity} (bio);
+    \draw[property] (author) -- node[right, font=\tiny] {hasAffiliation} (aff);
+    \draw[property] (aff) -- node[above, font=\tiny] {affiliatedWith} (org);
+    \draw[property] (author) -- node[left, font=\tiny] {hasProject} (nih);
+    \draw[property] (author) to[bend right=15] node[below, font=\tiny] {hasEmployment} (emp);
+    \draw[property] (author) to[bend left=15] node[below, font=\tiny] {hasEducation} (edu);
+    \draw[property] (emp) -- node[below, font=\tiny] {employedAt} (org);
+    \draw[property] (edu) -- node[below, font=\tiny] {educatedAt} (inst);
 \end{tikzpicture}
 \caption{Conceptual Model of PKG2020 Ontology}
 \end{figure}
 
 \subsection{T-Box Schema}
+
+The T-Box (Terminological Box) defines the ontology schema - classes, properties, and axioms.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    scale=0.75,
+    transform shape,
+    class/.style={rectangle, draw=green!60!black, fill=green!10, text width=1.8cm, text centered, rounded corners, minimum height=0.6cm, font=\scriptsize},
+    subclass/.style={rectangle, draw=blue!60, fill=blue!10, text width=1.5cm, text centered, rounded corners, minimum height=0.5cm, font=\tiny},
+    property/.style={->, thick, draw=orange!70!black},
+    inheritance/.style={->, dashed, draw=gray}
+]
+    % Row 0: owl:Thing
+    \node[class] (thing) at (4,0) {owl:Thing};
+    
+    % Row 1: Main classes
+    \node[class] (article) at (0,-1.5) {Article};
+    \node[class] (author) at (3,-1.5) {Author};
+    \node[class] (org) at (6,-1.5) {Organization};
+    \node[class] (bioentity) at (9,-1.5) {BioEntity};
+    
+    % Row 2: Subclasses and supporting
+    \node[subclass] (active) at (2,-3) {ActiveAuthor};
+    \node[subclass] (anon) at (4,-3) {AnonymousAuthor};
+    \node[subclass] (inst) at (6,-3) {Institution};
+    \node[subclass] (gene) at (8,-3) {Gene};
+    \node[subclass] (mutation) at (10,-3) {Mutation};
+    
+    % Row 3: Career/Funding
+    \node[class] (aff) at (1,-4.5) {Affiliation};
+    \node[class] (emp) at (4,-4.5) {Employment};
+    \node[class] (edu) at (7,-4.5) {Education};
+    \node[class] (nih) at (10,-4.5) {NIHProject};
+    
+    % Inheritance arrows
+    \draw[inheritance] (article) -- (thing);
+    \draw[inheritance] (author) -- (thing);
+    \draw[inheritance] (org) -- (thing);
+    \draw[inheritance] (bioentity) -- (thing);
+    \draw[inheritance] (active) -- (author);
+    \draw[inheritance] (anon) -- (author);
+    \draw[inheritance] (inst) -- (org);
+    \draw[inheritance] (gene) -- (bioentity);
+    \draw[inheritance] (mutation) -- (bioentity);
+    
+    % Properties
+    \draw[property] (article) -- node[above, font=\tiny] {writtenBy} (author);
+    \draw[property] (author) -- node[below, font=\tiny] {hasAffiliation} (aff);
+    \draw[property] (author) -- node[left, font=\tiny] {hasEmployment} (emp);
+    \draw[property] (author) -- node[right, font=\tiny] {hasEducation} (edu);
+    \draw[property] (author) -- node[below, font=\tiny] {hasProject} (nih);
+    \draw[property] (article) to[bend right=10] node[below, font=\tiny] {mentionsBioEntity} (bioentity);
+    
+    % Legend
+    \node[class, minimum width=0.8cm] at (11.5,-1.5) {};
+    \node[right, font=\tiny] at (12,-1.5) {Class};
+    \node[subclass, minimum width=0.8cm] at (11.5,-2) {};
+    \node[right, font=\tiny] at (12,-2) {Subclass};
+\end{tikzpicture}
+\caption{T-Box: Class Hierarchy and Object Properties}
+\label{fig:tbox-diagram}
+\end{figure}
 
 \begin{table}[H]
 \centering
@@ -1029,92 +1091,70 @@ Figure \ref{fig:full-ontology} shows the complete ontology schema with all 23 cl
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[
-    scale=0.85,
+    scale=0.7,
     transform shape,
-    node distance=0.6cm,
-    class/.style={draw, rounded corners, minimum width=1.8cm, minimum height=0.5cm, font=\scriptsize, align=center},
+    class/.style={draw, rounded corners, minimum width=1.5cm, minimum height=0.45cm, font=\tiny, align=center},
     core/.style={class, fill=red!15},
     bio/.style={class, fill=green!15},
     career/.style={class, fill=blue!15},
     defined/.style={class, fill=yellow!15},
-    enum/.style={class, fill=purple!15},
-    prop/.style={->, thick, font=\tiny}
+    prop/.style={->, font=\tiny}
 ]
-    % === CORE CLASSES ===
-    \node[core] (article) at (0,0) {Article};
-    \node[core] (author) at (4,0) {Author};
-    \node[core] (authorship) at (2,-1.5) {Authorship};
+    % Row 0: Defined classes
+    \node[defined] (single) at (0,2) {SingleAuthorArticle};
+    \node[defined] (multi) at (2.5,2) {MultiAuthorArticle};
+    \node[defined] (active) at (5,2) {ActiveAuthor};
+    \node[defined] (anon) at (7.5,2) {AnonymousAuthor};
+    \node[defined] (prolific) at (10,2) {ProlificAuthor};
     
-    % === ORGANIZATIONAL ===
-    \node[career] (org) at (8,0) {Organization};
-    \node[career] (inst) at (8,-2) {Institution};
-    \node[career] (aff) at (6,-1.5) {Affiliation};
+    % Row 1: Core
+    \node[core] (article) at (1.25,0) {Article};
+    \node[core] (author) at (5,0) {Author};
+    \node[career] (org) at (8.5,0) {Organization};
+    \node[career] (inst) at (11,0) {Institution};
     
-    % === CAREER ===
-    \node[career] (emp) at (4,-3) {Employment};
-    \node[career] (edu) at (6,-3) {Education};
+    % Row 2: Supporting
+    \node[bio] (bioent) at (-1,-2) {BioEntity};
+    \node[core] (authorship) at (2,-2) {Authorship};
+    \node[career] (aff) at (5,-2) {Affiliation};
+    \node[career] (emp) at (8,-2) {Employment};
+    \node[career] (edu) at (11,-2) {Education};
     
-    % === FUNDING ===
-    \node[career] (nih) at (4,-4.5) {NIHProject};
+    % Row 3: Bio subclasses and NIH
+    \node[bio] (gene) at (-2,-4) {Gene};
+    \node[bio] (mutation) at (0,-4) {Mutation};
+    \node[bio] (species) at (2,-4) {Species};
+    \node[career] (nih) at (6,-4) {NIHProject};
     
-    % === BIO-ENTITIES ===
-    \node[bio] (bioent) at (-2,-1.5) {BioEntity};
-    \node[bio] (gene) at (-4,-2.5) {Gene};
-    \node[bio] (disease) at (-3,-3.5) {Disease};
-    \node[bio] (chemical) at (-2,-2.5) {Chemical};
-    \node[bio] (species) at (-1,-3.5) {Species};
-    \node[bio] (mutation) at (0,-2.5) {Mutation};
-    
-    % === DEFINED CLASSES ===
-    \node[defined] (active) at (2,1.5) {ActiveAuthor};
-    \node[defined] (anon) at (4,1.5) {AnonymousAuthor};
-    \node[defined] (prolific) at (6,1.5) {ProlificAuthor};
-    \node[defined] (single) at (-1,1.5) {SingleAuthorArticle};
-    \node[defined] (multi) at (1,1.5) {MultiAuthorArticle};
-    
-    % === ENUMERATION ===
-    \node[enum] (status) at (-2,0) {PublicationStatus};
-    
-    % === RELATIONSHIPS ===
-    \draw[prop] (article) -- node[above] {writtenBy} (author);
-    \draw[prop] (article) -- node[left] {hasAuthorship} (authorship);
-    \draw[prop] (authorship) -- node[right] {refersToAuthor} (author);
-    \draw[prop] (article) -- node[above] {mentionsBioEntity} (bioent);
-    \draw[prop] (article) -- node[above] {hasStatus} (status);
-    
-    \draw[prop] (author) -- node[above] {hasAffiliation} (aff);
-    \draw[prop] (aff) -- node[above] {affiliatedWith} (org);
-    \draw[prop] (author) -- node[left] {hasEmployment} (emp);
-    \draw[prop] (emp) -- node[below] {employedAt} (org);
-    \draw[prop] (author) -- node[right] {hasEducation} (edu);
-    \draw[prop] (edu) -- node[below] {educatedAt} (inst);
-    \draw[prop] (author) -- node[left] {hasProject} (nih);
-    
-    % Subclass arrows
-    \draw[->, dashed] (gene) -- (bioent);
-    \draw[->, dashed] (disease) -- (bioent);
-    \draw[->, dashed] (chemical) -- (bioent);
-    \draw[->, dashed] (species) -- (bioent);
-    \draw[->, dashed] (mutation) -- (bioent);
-    
+    % Subclass arrows (dashed)
+    \draw[->, dashed] (single) -- (article);
+    \draw[->, dashed] (multi) -- (article);
     \draw[->, dashed] (active) -- (author);
     \draw[->, dashed] (anon) -- (author);
     \draw[->, dashed] (prolific) -- (author);
-    \draw[->, dashed] (single) -- (article);
-    \draw[->, dashed] (multi) -- (article);
+    \draw[->, dashed] (gene) -- (bioent);
+    \draw[->, dashed] (mutation) -- (bioent);
+    \draw[->, dashed] (species) -- (bioent);
+    \draw[->, dashed] (inst) -- (org);
+    
+    % Properties
+    \draw[prop] (article) -- node[above] {writtenBy} (author);
+    \draw[prop] (article) -- node[left] {mentionsBioEntity} (bioent);
+    \draw[prop] (author) -- node[right] {hasAffiliation} (aff);
+    \draw[prop] (aff) -- node[above] {affiliatedWith} (org);
+    \draw[prop] (author) -- node[above] {hasEmployment} (emp);
+    \draw[prop] (author) -- node[above] {hasEducation} (edu);
+    \draw[prop] (author) -- node[left] {hasProject} (nih);
     
     % Legend
-    \node[core, minimum width=1cm] at (-4,1.5) {};
-    \node[right, font=\tiny] at (-3.3,1.5) {Core};
-    \node[bio, minimum width=1cm] at (-4,1) {};
-    \node[right, font=\tiny] at (-3.3,1) {Bio-Entity};
-    \node[career, minimum width=1cm] at (-4,0.5) {};
-    \node[right, font=\tiny] at (-3.3,0.5) {Career/Org};
-    \node[defined, minimum width=1cm] at (-4,0) {};
-    \node[right, font=\tiny] at (-3.3,0) {Defined};
-    \node[enum, minimum width=1cm] at (-4,-0.5) {};
-    \node[right, font=\tiny] at (-3.3,-0.5) {Enum};
-    
+    \node[core, minimum width=0.8cm] at (-2,0) {};
+    \node[right, font=\tiny] at (-1.5,0) {Core};
+    \node[bio, minimum width=0.8cm] at (-2,-0.5) {};
+    \node[right, font=\tiny] at (-1.5,-0.5) {Bio};
+    \node[career, minimum width=0.8cm] at (-2,-1) {};
+    \node[right, font=\tiny] at (-1.5,-1) {Career};
+    \node[defined, minimum width=0.8cm] at (-2,-1.5) {};
+    \node[right, font=\tiny] at (-1.5,-1.5) {Defined};
 \end{tikzpicture}
 \caption{Complete PKG2020 Ontology Schema with 23 Classes and Object Properties}
 \label{fig:full-ontology}

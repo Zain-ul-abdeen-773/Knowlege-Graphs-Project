@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.12.18)  24 DEC 2025 22:33
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2025.12.18)  24 DEC 2025 22:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1061,8 +1061,13 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has
                                                   \__shipout_drop_firstpage_...
 l.210 \end{longtable}
                      ]
-Overfull \hbox (114.56073pt too wide) in paragraph at lines 255--256
- [][] 
+Overfull \hbox (0.6491pt too wide) in paragraph at lines 282--282
+ [][]\T1/cmr/m/n/6 ActiveAuthor 
+ []
+
+
+Overfull \hbox (17.71162pt too wide) in paragraph at lines 283--283
+ [][]\T1/cmr/m/n/6 AnonymousAuthor 
  []
 
 [6
@@ -1070,83 +1075,89 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.282 
+l.322 
       ]
 (C:\Users\Zain\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
 File: lstlang1.sty 2023/02/27 1.9 listings language file
 )
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
-nput line 303.
+nput line 365.
 LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 3
-03.
+65.
 
 (C:\Users\Zain\AppData\Local\Programs\MiKTeX\tex/latex/base\t1cmtt.fd
 File: t1cmtt.fd 2023/04/13 v2.5m Standard LaTeX font definitions
 ) [7
+pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) ha
+s been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.370 published 
+                = PublicationStatus("Published")
 pdfTeX warning (ext4): destination with the same identifier (name{table.3}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.320 ...Python, caption=Cardinality Restrictions]
-                                                  ] [8] [9
+l.370 published 
+                = PublicationStatus("Published")] [8] [9
 pdfTeX warning (ext4): destination with the same identifier (name{table.4}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.422  
+l.484  
           domain = [Article]
 pdfTeX warning (ext4): destination with the same identifier (name{table.5}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.422  
+l.484  
           domain = [Article]] [10
 pdfTeX warning (ext4): destination with the same identifier (name{table.6}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.482  
+l.544  
                   article = onto.Article(f"Article_{pmid}")]
-<Wikidata.png, id=597, 607.068pt x 384.2355pt>
+<Wikidata.png, id=599, 607.068pt x 384.2355pt>
 File: Wikidata.png Graphic file (type png)
 <use Wikidata.png>
-Package pdftex.def Info: Wikidata.png  used on input line 532.
+Package pdftex.def Info: Wikidata.png  used on input line 594.
 (pdftex.def)             Requested size: 407.66833pt x 258.0286pt.
  [11]
-<databus.png, id=628, 539.01375pt x 358.941pt>
+<databus.png, id=630, 539.01375pt x 358.941pt>
 File: databus.png Graphic file (type png)
 <use databus.png>
-Package pdftex.def Info: databus.png  used on input line 539.
+Package pdftex.def Info: databus.png  used on input line 601.
 (pdftex.def)             Requested size: 407.66833pt x 271.47803pt.
-<LOD.png, id=629, 572.73975pt x 404.712pt>
+<LOD.png, id=631, 572.73975pt x 404.712pt>
 File: LOD.png Graphic file (type png)
 <use LOD.png>
-Package pdftex.def Info: LOD.png  used on input line 546.
+Package pdftex.def Info: LOD.png  used on input line 608.
 (pdftex.def)             Requested size: 407.66833pt x 288.07623pt.
  [12
-pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) ha
-s been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.550 
-      
 pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.550 
-       <./Wikidata.png> <./databus.png>] [13
+l.612 
+      
 pdfTeX warning (ext4): destination with the same identifier (name{figure.4}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.585 ...guage=Python, caption=SWRL Rule Examples]
+l.612 
+       <./Wikidata.png> <./databus.png>] [13
+pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) ha
+s been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.647 ...guage=Python, caption=SWRL Rule Examples]
                                                    <./LOD.png>] [14
 pdfTeX warning (ext4): destination with the same identifier (name{table.7}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.645     \item \textbf
+l.707     \item \textbf
                        {AnonymousAuthor}: Author\_HAND\_002 classified (no c...
 ] (C:\Users\Zain\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
 File: lstlang1.sty 2023/02/27 1.9 listings language file
@@ -1168,61 +1179,62 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.8}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.1016     \item \textbf
+l.1078     \item \textbf
                         {T-Box Only}: \texttt{pkg2020\_tbox\_only.owl} - Con...
 
 pdfTeX warning (ext4): destination with the same identifier (name{table.9}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.1016     \item \textbf
+l.1078     \item \textbf
                         {T-Box Only}: \texttt{pkg2020\_tbox\_only.owl} - Con...
 ]
-Overfull \hbox (5.04797pt too wide) in paragraph at lines 1017--1018
+Overfull \hbox (5.04797pt too wide) in paragraph at lines 1079--1080
 []\T1/cmr/bx/n/12 With In-di-vid-u-als\T1/cmr/m/n/12 : \T1/cmtt/m/n/12 pkg2020_
 hand_annotated.owl \T1/cmr/m/n/12 - Con-tains 10+ hand-annotated
  []
 
 
-Overfull \hbox (8.93604pt too wide) in paragraph at lines 1157--1158
+Overfull \hbox (8.93604pt too wide) in paragraph at lines 1197--1198
  [][] 
  []
 
 [22
-pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) ha
-s been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.1161 
-       ]
-Package pgfplots info on input line 1232: Using 'lua backend=false' for axis: x
- coord trafo unsupported.
- [23
 pdfTeX warning (ext4): destination with the same identifier (name{figure.6}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.1247 
-       
+l.1251 \end{figure}
+                   
 pdfTeX warning (ext4): destination with the same identifier (name{figure.7}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.1247 
-       ] [24
+l.1251 \end{figure}
+                   ]
+Package pgfplots info on input line 1272: Using 'lua backend=false' for axis: x
+ coord trafo unsupported.
+ [23
 pdfTeX warning (ext4): destination with the same identifier (name{figure.8}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.1287 
-       ] [25
+l.1302     \item \textbf
+                        {Dashboard}: Real-time statistics fetched from GraphDB
 pdfTeX warning (ext4): destination with the same identifier (name{figure.9}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.1337     \item S
-                  pecial characters in organization names caused parsing issues
-] [26] (project_report.aux)
+l.1302     \item \textbf
+                        {Dashboard}: Real-time statistics fetched from GraphDB]
+[24
+pdfTeX warning (ext4): destination with the same identifier (name{figure.10}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.1366     \item S
+                  emantic querying across heterogeneous datasets] [25] [26]
+(project_report.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
@@ -1231,10 +1243,10 @@ Package rerunfilecheck Info: File `project_report.out' has not changed.
 (rerunfilecheck)             Checksum: 74FE200614C5B210899433D3AE406106;15301.
  ) 
 Here is how much of TeX's memory you used:
- 36531 strings out of 474486
- 851203 string characters out of 5744226
+ 36560 strings out of 474486
+ 851809 string characters out of 5744226
  2141542 words of memory out of 5000000
- 57720 multiletter control sequences out of 15000+600000
+ 57748 multiletter control sequences out of 15000+600000
  573455 words of font info for 66 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,11n,87p,737b,2349s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1258,9 +1270,9 @@ rs/Zain/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb>
 12.pfb><C:/Users/Zain/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts
 /cm/cmr6.pfb><C:/Users/Zain/AppData/Local/Programs/MiKTeX/fonts/type1/public/am
 sfonts/cm/cmsy10.pfb>
-Output written on project_report.pdf (27 pages, 592984 bytes).
+Output written on project_report.pdf (27 pages, 591615 bytes).
 PDF statistics:
- 1787 PDF objects out of 2073 (max. 8388607)
- 537 named destinations out of 1000 (max. 500000)
+ 1776 PDF objects out of 2073 (max. 8388607)
+ 538 named destinations out of 1000 (max. 500000)
  676 words of extra memory for PDF output out of 10000 (max. 10000000)
 

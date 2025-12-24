@@ -9,10 +9,10 @@
 \contentsline {section}{\numberline {3}Competency Questions}{5}{section.3}%
 \contentsline {section}{\numberline {4}Conceptual Model}{6}{section.4}%
 \contentsline {subsection}{\numberline {4.1}Conceptual Model Diagram}{6}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}T-Box Schema}{7}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.2}T-Box Schema}{6}{subsection.4.2}%
 \contentsline {section}{\numberline {5}Ontology Design}{7}{section.5}%
 \contentsline {subsection}{\numberline {5.1}Classes (20+ as Required)}{7}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}Enumeration Class}{7}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.2}Enumeration Class}{8}{subsection.5.2}%
 \contentsline {subsection}{\numberline {5.3}Cardinality Restrictions}{8}{subsection.5.3}%
 \contentsline {subsection}{\numberline {5.4}Intersection, Union, and Complement Classes}{8}{subsection.5.4}%
 \contentsline {subsection}{\numberline {5.5}Object Properties}{9}{subsection.5.5}%
@@ -67,15 +67,15 @@
 \contentsline {subsection}{\numberline {13.1}Complete Ontology Schema (All 23 Classes)}{22}{subsection.13.1}%
 \contentsline {subsection}{\numberline {13.2}RDF Triple Pattern (Subject-Predicate-Object)}{22}{subsection.13.2}%
 \contentsline {subsection}{\numberline {13.3}Sample Knowledge Graph Visualization}{23}{subsection.13.3}%
-\contentsline {subsection}{\numberline {13.4}Knowledge Graph Statistics}{24}{subsection.13.4}%
-\contentsline {subsection}{\numberline {13.5}Tools Used}{24}{subsection.13.5}%
+\contentsline {subsection}{\numberline {13.4}Knowledge Graph Statistics}{23}{subsection.13.4}%
+\contentsline {subsection}{\numberline {13.5}Tools Used}{23}{subsection.13.5}%
 \contentsline {subsection}{\numberline {13.6}Web Application Features}{24}{subsection.13.6}%
-\contentsline {subsection}{\numberline {13.7}Live GraphDB Endpoint}{25}{subsection.13.7}%
-\contentsline {section}{\numberline {14}Reflection}{25}{section.14}%
-\contentsline {subsection}{\numberline {14.1}Learning Outcomes}{25}{subsection.14.1}%
+\contentsline {subsection}{\numberline {13.7}Live GraphDB Endpoint}{24}{subsection.13.7}%
+\contentsline {section}{\numberline {14}Reflection}{24}{section.14}%
+\contentsline {subsection}{\numberline {14.1}Learning Outcomes}{24}{subsection.14.1}%
 \contentsline {subsection}{\numberline {14.2}Added Value of Linked Data}{25}{subsection.14.2}%
-\contentsline {subsection}{\numberline {14.3}Challenges Faced}{26}{subsection.14.3}%
-\contentsline {section}{\numberline {15}Conclusion}{26}{section.15}%
-\contentsline {section}{\numberline {16}References}{26}{section.16}%
+\contentsline {subsection}{\numberline {14.3}Challenges Faced}{25}{subsection.14.3}%
+\contentsline {section}{\numberline {15}Conclusion}{25}{section.15}%
+\contentsline {section}{\numberline {16}References}{25}{section.16}%
 \contentsline {section}{\numberline {17}Appendix: Project Repository}{26}{section.17}%
 \contentsline {subsection}{\numberline {17.1}Repository Structure}{26}{subsection.17.1}%

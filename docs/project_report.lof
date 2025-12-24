@@ -1,9 +1,10 @@
 \contentsline {figure}{\numberline {1}{\ignorespaces Conceptual Model of PKG2020 Ontology}}{6}{figure.1}%
-\contentsline {figure}{\numberline {2}{\ignorespaces Wikidata Search: No results for PKG2020 dataset}}{12}{figure.2}%
-\contentsline {figure}{\numberline {3}{\ignorespaces DBpedia Databus Search: PKG2020 not found}}{12}{figure.3}%
-\contentsline {figure}{\numberline {4}{\ignorespaces Linked Open Data Cloud: Dataset not registered}}{13}{figure.4}%
-\contentsline {figure}{\numberline {5}{\ignorespaces Complete PKG2020 Ontology Schema with 23 Classes and Object Properties}}{22}{figure.5}%
-\contentsline {figure}{\numberline {6}{\ignorespaces RDF Triple Pattern Examples: Subject $\rightarrow $ Predicate $\rightarrow $ Object}}{23}{figure.6}%
-\contentsline {figure}{\numberline {7}{\ignorespaces Sample Knowledge Graph: Article with Authors, Bio-Entities, and Affiliations}}{23}{figure.7}%
-\contentsline {figure}{\numberline {8}{\ignorespaces Distribution of Entity Types in Knowledge Graph (2.1M+ triples)}}{24}{figure.8}%
-\contentsline {figure}{\numberline {9}{\ignorespaces Web Application Architecture}}{25}{figure.9}%
+\contentsline {figure}{\numberline {2}{\ignorespaces T-Box: Class Hierarchy and Object Properties}}{7}{figure.2}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Wikidata Search: No results for PKG2020 dataset}}{12}{figure.3}%
+\contentsline {figure}{\numberline {4}{\ignorespaces DBpedia Databus Search: PKG2020 not found}}{12}{figure.4}%
+\contentsline {figure}{\numberline {5}{\ignorespaces Linked Open Data Cloud: Dataset not registered}}{13}{figure.5}%
+\contentsline {figure}{\numberline {6}{\ignorespaces Complete PKG2020 Ontology Schema with 23 Classes and Object Properties}}{22}{figure.6}%
+\contentsline {figure}{\numberline {7}{\ignorespaces RDF Triple Pattern Examples: Subject $\rightarrow $ Predicate $\rightarrow $ Object}}{22}{figure.7}%
+\contentsline {figure}{\numberline {8}{\ignorespaces Sample Knowledge Graph: Article with Authors, Bio-Entities, and Affiliations}}{23}{figure.8}%
+\contentsline {figure}{\numberline {9}{\ignorespaces Distribution of Entity Types in Knowledge Graph (2.1M+ triples)}}{23}{figure.9}%
+\contentsline {figure}{\numberline {10}{\ignorespaces Web Application Architecture}}{24}{figure.10}%
