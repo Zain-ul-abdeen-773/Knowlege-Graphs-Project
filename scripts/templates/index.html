@@ -1111,44 +1111,83 @@
                 .attr('width', width)
                 .attr('height', height);
             
-            const simulation = d3.forceSimulation(nodesArray)
-                .force('link', d3.forceLink(linksFiltered).id(d => d.id).distance(80))
-                .force('charge', d3.forceManyBody().strength(-200))
-                .force('center', d3.forceCenter(width / 2, height / 2));
+            // Add arrow markers
+            svg.append('defs').append('marker')
+                .attr('id', 'arrow-results')
+                .attr('viewBox', '-0 -5 10 10')
+                .attr('refX', 18)
+                .attr('refY', 0)
+                .attr('orient', 'auto')
+                .attr('markerWidth', 5)
+                .attr('markerHeight', 5)
+                .append('path')
+                .attr('d', 'M 0,-5 L 10,0 L 0,5')
+                .attr('fill', '#888');
             
+            const simulation = d3.forceSimulation(nodesArray)
+                .force('link', d3.forceLink(linksFiltered).id(d => d.id).distance(120))
+                .force('charge', d3.forceManyBody().strength(-250))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide().radius(40));
+            
+            // Draw edges
             const link = svg.append('g')
                 .selectAll('line')
                 .data(linksFiltered)
                 .enter().append('line')
-                .attr('stroke', '#444')
-                .attr('stroke-width', 1.5);
+                .attr('stroke', '#666')
+                .attr('stroke-width', 2)
+                .attr('marker-end', 'url(#arrow-results)');
             
+            // Draw edge labels (predicates)
+            const edgeLabels = svg.append('g')
+                .selectAll('text')
+                .data(linksFiltered)
+                .enter().append('text')
+                .text(d => d.label.substring(0, 18))
+                .attr('fill', '#f39c12')
+                .attr('font-size', '7px')
+                .attr('font-weight', 'bold')
+                .attr('text-anchor', 'middle');
+            
+            // Draw nodes
             const node = svg.append('g')
                 .selectAll('circle')
                 .data(nodesArray)
                 .enter().append('circle')
-                .attr('r', 12)
+                .attr('r', d => d.type === 'subject' ? 14 : 10)
                 .attr('fill', d => d.color)
                 .attr('stroke', '#fff')
                 .attr('stroke-width', 2)
+                .style('cursor', 'pointer')
                 .call(d3.drag()
                     .on('start', (e) => { if (!e.active) simulation.alphaTarget(0.3).restart(); e.subject.fx = e.subject.x; e.subject.fy = e.subject.y; })
                     .on('drag', (e) => { e.subject.fx = e.x; e.subject.fy = e.y; })
                     .on('end', (e) => { if (!e.active) simulation.alphaTarget(0); e.subject.fx = null; e.subject.fy = null; }));
             
+            // Tooltips
+            node.append('title').text(d => `${d.type.toUpperCase()}: ${d.id}`);
+            
+            // Draw ALL node labels
             const labels = svg.append('g')
                 .selectAll('text')
                 .data(nodesArray)
                 .enter().append('text')
-                .text(d => d.id.substring(0, 15))
-                .attr('fill', '#fff')
-                .attr('font-size', '8px')
-                .attr('dx', 15)
+                .text(d => d.id.length > 20 ? d.id.substring(0, 18) + '...' : d.id)
+                .attr('fill', d => d.type === 'subject' ? '#fff' : '#ccc')
+                .attr('font-size', d => d.type === 'subject' ? '9px' : '7px')
+                .attr('font-weight', d => d.type === 'subject' ? 'bold' : 'normal')
+                .attr('dx', d => (d.type === 'subject' ? 16 : 12))
                 .attr('dy', 3);
             
             simulation.on('tick', () => {
                 link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
                     .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+                    
+                edgeLabels
+                    .attr('x', d => (d.source.x + d.target.x) / 2)
+                    .attr('y', d => (d.source.y + d.target.y) / 2 - 4);
+                    
                 node.attr('cx', d => d.x).attr('cy', d => d.y);
                 labels.attr('x', d => d.x).attr('y', d => d.y);
             });
@@ -1222,18 +1261,46 @@ LIMIT ${limit}`;
                     .attr('width', width)
                     .attr('height', height);
                 
-                const simulation = d3.forceSimulation(nodesArray)
-                    .force('link', d3.forceLink(links).id(d => d.id).distance(100))
-                    .force('charge', d3.forceManyBody().strength(-150))
-                    .force('center', d3.forceCenter(width / 2, height / 2));
+                // Add arrow markers for directed edges
+                svg.append('defs').append('marker')
+                    .attr('id', 'arrowhead')
+                    .attr('viewBox', '-0 -5 10 10')
+                    .attr('refX', 20)
+                    .attr('refY', 0)
+                    .attr('orient', 'auto')
+                    .attr('markerWidth', 6)
+                    .attr('markerHeight', 6)
+                    .append('path')
+                    .attr('d', 'M 0,-5 L 10,0 L 0,5')
+                    .attr('fill', '#888');
                 
+                const simulation = d3.forceSimulation(nodesArray)
+                    .force('link', d3.forceLink(links).id(d => d.id).distance(150))
+                    .force('charge', d3.forceManyBody().strength(-300))
+                    .force('center', d3.forceCenter(width / 2, height / 2))
+                    .force('collision', d3.forceCollide().radius(50));
+                
+                // Draw edges (lines)
                 const link = svg.append('g')
                     .selectAll('line')
                     .data(links)
                     .enter().append('line')
-                    .attr('stroke', '#444')
-                    .attr('stroke-width', 1.5);
+                    .attr('stroke', '#666')
+                    .attr('stroke-width', 2)
+                    .attr('marker-end', 'url(#arrowhead)');
                 
+                // Draw edge labels (predicates)
+                const edgeLabels = svg.append('g')
+                    .selectAll('text')
+                    .data(links)
+                    .enter().append('text')
+                    .text(d => d.label.substring(0, 20))
+                    .attr('fill', '#f39c12')
+                    .attr('font-size', '8px')
+                    .attr('font-weight', 'bold')
+                    .attr('text-anchor', 'middle');
+                
+                // Draw nodes (circles)
                 const node = svg.append('g')
                     .selectAll('circle')
                     .data(nodesArray)
@@ -1242,28 +1309,41 @@ LIMIT ${limit}`;
                     .attr('fill', d => d.color)
                     .attr('stroke', '#fff')
                     .attr('stroke-width', 2)
+                    .style('cursor', 'pointer')
                     .call(d3.drag()
                         .on('start', (e) => { if (!e.active) simulation.alphaTarget(0.3).restart(); e.subject.fx = e.subject.x; e.subject.fy = e.subject.y; })
                         .on('drag', (e) => { e.subject.fx = e.x; e.subject.fy = e.y; })
                         .on('end', (e) => { if (!e.active) simulation.alphaTarget(0); e.subject.fx = null; e.subject.fy = null; }));
                 
-                // Tooltips
-                node.append('title').text(d => d.id);
+                // Tooltips (full text on hover)
+                node.append('title').text(d => `${d.type.toUpperCase()}: ${d.id}`);
                 
+                // Draw ALL node labels
                 const labels = svg.append('g')
                     .selectAll('text')
-                    .data(nodesArray.filter(n => n.type === 'subject'))
+                    .data(nodesArray)
                     .enter().append('text')
-                    .text(d => d.id.substring(0, 20))
-                    .attr('fill', '#fff')
-                    .attr('font-size', '9px')
-                    .attr('dx', 15)
-                    .attr('dy', 3);
+                    .text(d => d.id.length > 25 ? d.id.substring(0, 22) + '...' : d.id)
+                    .attr('fill', d => d.type === 'subject' ? '#fff' : '#ccc')
+                    .attr('font-size', d => d.type === 'subject' ? '10px' : '8px')
+                    .attr('font-weight', d => d.type === 'subject' ? 'bold' : 'normal')
+                    .attr('dx', d => d.size + 5)
+                    .attr('dy', 4);
                 
                 simulation.on('tick', () => {
+                    // Update link positions
                     link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
                         .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+                    
+                    // Update edge label positions (midpoint of edge)
+                    edgeLabels
+                        .attr('x', d => (d.source.x + d.target.x) / 2)
+                        .attr('y', d => (d.source.y + d.target.y) / 2 - 5);
+                    
+                    // Update node positions
                     node.attr('cx', d => d.x).attr('cy', d => d.y);
+                    
+                    // Update node label positions
                     labels.attr('x', d => d.x).attr('y', d => d.y);
                 });
                 
