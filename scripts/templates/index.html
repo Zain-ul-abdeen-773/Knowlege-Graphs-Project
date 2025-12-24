@@ -808,7 +808,7 @@
                     .data(data.links)
                     .enter()
                     .append('line')
-                    .attr('stroke', '#94a3b8')
+                    .attr('stroke', '#00d4ff')
                     .attr('stroke-width', 2);
                 
                 // Nodes
@@ -826,16 +826,16 @@
                         .on('drag', dragged)
                         .on('end', dragended));
                 
-                // Labels
+                // Labels - WHITE TEXT
                 const labels = svg.append('g')
                     .selectAll('text')
                     .data(data.nodes)
                     .enter()
                     .append('text')
                     .text(d => d.id)
-                    .attr('fill', '#1e293b')
+                    .attr('fill', '#ffffff')
                     .attr('font-size', '10px')
-                    .attr('font-weight', '500')
+                    .attr('font-weight', 'bold')
                     .attr('dx', 15)
                     .attr('dy', 4);
                 
@@ -1162,8 +1162,22 @@
                 .selectAll('line')
                 .data(linksFiltered)
                 .enter().append('line')
-                .attr('stroke', '#444')
-                .attr('stroke-width', 1.5);
+                .attr('stroke', '#00d4ff')
+                .attr('stroke-width', 1.5)
+                .attr('marker-end', 'url(#arrow)');
+            
+            // Arrow marker for directed edges
+            svg.append('defs').append('marker')
+                .attr('id', 'arrow')
+                .attr('viewBox', '0 -5 10 10')
+                .attr('refX', 20)
+                .attr('refY', 0)
+                .attr('markerWidth', 6)
+                .attr('markerHeight', 6)
+                .attr('orient', 'auto')
+                .append('path')
+                .attr('d', 'M0,-5L10,0L0,5')
+                .attr('fill', '#00d4ff');
             
             const node = svg.append('g')
                 .selectAll('circle')
@@ -1171,28 +1185,43 @@
                 .enter().append('circle')
                 .attr('r', 12)
                 .attr('fill', d => d.color)
-                .attr('stroke', '#fff')
+                .attr('stroke', '#00d4ff')
                 .attr('stroke-width', 2)
                 .call(d3.drag()
                     .on('start', (e) => { if (!e.active) simulation.alphaTarget(0.3).restart(); e.subject.fx = e.subject.x; e.subject.fy = e.subject.y; })
                     .on('drag', (e) => { e.subject.fx = e.x; e.subject.fy = e.y; })
                     .on('end', (e) => { if (!e.active) simulation.alphaTarget(0); e.subject.fx = null; e.subject.fy = null; }));
             
+            // Node labels (Subject/Object) - WHITE TEXT
             const labels = svg.append('g')
                 .selectAll('text')
                 .data(nodesArray)
                 .enter().append('text')
-                .text(d => d.id.substring(0, 15))
-                .attr('fill', '#fff')
-                .attr('font-size', '8px')
+                .text(d => d.id.substring(0, 20))
+                .attr('fill', '#ffffff')
+                .attr('font-size', '9px')
+                .attr('font-weight', 'bold')
                 .attr('dx', 15)
                 .attr('dy', 3);
+            
+            // Edge labels (Predicate) - CYAN TEXT
+            const edgeLabels = svg.append('g')
+                .selectAll('text')
+                .data(linksFiltered)
+                .enter().append('text')
+                .text(d => d.label ? d.label.substring(0, 15) : '')
+                .attr('fill', '#00ffff')
+                .attr('font-size', '7px')
+                .attr('text-anchor', 'middle');
             
             simulation.on('tick', () => {
                 link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
                     .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
                 node.attr('cx', d => d.x).attr('cy', d => d.y);
                 labels.attr('x', d => d.x).attr('y', d => d.y);
+                edgeLabels
+                    .attr('x', d => (d.source.x + d.target.x) / 2)
+                    .attr('y', d => (d.source.y + d.target.y) / 2);
             });
         }
         
@@ -1273,8 +1302,22 @@ LIMIT ${limit}`;
                     .selectAll('line')
                     .data(links)
                     .enter().append('line')
-                    .attr('stroke', '#444')
-                    .attr('stroke-width', 1.5);
+                    .attr('stroke', '#00d4ff')
+                    .attr('stroke-width', 1.5)
+                    .attr('marker-end', 'url(#arrow2)');
+                
+                // Arrow marker for directed edges
+                svg.append('defs').append('marker')
+                    .attr('id', 'arrow2')
+                    .attr('viewBox', '0 -5 10 10')
+                    .attr('refX', 25)
+                    .attr('refY', 0)
+                    .attr('markerWidth', 6)
+                    .attr('markerHeight', 6)
+                    .attr('orient', 'auto')
+                    .append('path')
+                    .attr('d', 'M0,-5L10,0L0,5')
+                    .attr('fill', '#00d4ff');
                 
                 const node = svg.append('g')
                     .selectAll('circle')
@@ -1282,7 +1325,7 @@ LIMIT ${limit}`;
                     .enter().append('circle')
                     .attr('r', d => d.size)
                     .attr('fill', d => d.color)
-                    .attr('stroke', '#fff')
+                    .attr('stroke', '#00d4ff')
                     .attr('stroke-width', 2)
                     .call(d3.drag()
                         .on('start', (e) => { if (!e.active) simulation.alphaTarget(0.3).restart(); e.subject.fx = e.subject.x; e.subject.fy = e.subject.y; })
@@ -1292,21 +1335,36 @@ LIMIT ${limit}`;
                 // Tooltips
                 node.append('title').text(d => d.id);
                 
+                // Node labels (Subject/Object) - WHITE TEXT for ALL nodes
                 const labels = svg.append('g')
                     .selectAll('text')
-                    .data(nodesArray.filter(n => n.type === 'subject'))
+                    .data(nodesArray)
                     .enter().append('text')
                     .text(d => d.id.substring(0, 20))
-                    .attr('fill', '#fff')
+                    .attr('fill', '#ffffff')
                     .attr('font-size', '9px')
-                    .attr('dx', 15)
+                    .attr('font-weight', 'bold')
+                    .attr('dx', d => d.size + 5)
                     .attr('dy', 3);
+                
+                // Edge labels (Predicate) - CYAN TEXT
+                const edgeLabels = svg.append('g')
+                    .selectAll('text')
+                    .data(links)
+                    .enter().append('text')
+                    .text(d => d.label ? d.label.replace('http://example.org/pkg2020/ontology.owl#', '') : '')
+                    .attr('fill', '#00ffff')
+                    .attr('font-size', '8px')
+                    .attr('text-anchor', 'middle');
                 
                 simulation.on('tick', () => {
                     link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
                         .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
                     node.attr('cx', d => d.x).attr('cy', d => d.y);
                     labels.attr('x', d => d.x).attr('y', d => d.y);
+                    edgeLabels
+                        .attr('x', d => (d.source.x + d.target.x) / 2)
+                        .attr('y', d => (d.source.y + d.target.y) / 2);
                 });
                 
             } catch (e) {
