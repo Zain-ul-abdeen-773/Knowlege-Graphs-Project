@@ -8,6 +8,9 @@ PKG2020S4 Knowledge Representation and Reasoning (KRR) project using OWL/RDF ont
 ├── scripts/           # Python scripts
 │   ├── ontology_core.py           # Base ontology with 20+ classes
 │   ├── ontology_constraints.py    # OWL axioms and constraints
+│   ├── create_tbox_ontology.py    # T-Box only ontology (NEW)
+│   ├── create_hand_annotated_individuals.py  # 10+ hand-annotated (NEW)
+│   ├── create_swrl_rules.py       # SWRL rules (NEW)
 │   ├── populate_authors_articles.py
 │   ├── populate_affiliations.py
 │   ├── populate_employment.py
@@ -20,13 +23,17 @@ PKG2020S4 Knowledge Representation and Reasoning (KRR) project using OWL/RDF ont
 │   ├── sparql_queries.py          # SPARQL competency queries
 │   └── webapp.py                  # BONUS: Web application
 ├── owl/               # Generated OWL ontology files
+│   ├── pkg2020_tbox_only.owl      # T-Box without individuals (NEW)
+│   ├── pkg2020_hand_annotated.owl # Hand-annotated individuals (NEW)
+│   ├── pkg2020_with_swrl.owl      # T-Box with SWRL rules (NEW)
 │   ├── pkg2020_core.owl
 │   ├── pkg2020_constrained.owl
 │   ├── pkg2020_final.owl
+│   ├── pkg2020_final.ttl          # For GraphDB
 │   └── pkg2020_linked.owl         # With external links
 ├── docs/              # Documentation
 │   ├── conceptual_model.md        # Ontology diagram
-│   ├── project_report.md          # Full report
+│   ├── project_report.tex         # Full LaTeX report
 │   └── visualization_guide.md     # GraphDB/Protégé guide
 └── data/              # CSV data files (not included)
 ```
@@ -62,13 +69,30 @@ python webapp_sparql.py
 
 ## 🌐 SPARQL Endpoint
 
-The project includes a fully-featured SPARQL endpoint:
+The project uses **GraphDB Sandbox** as the live SPARQL endpoint:
 
-### Quick Start
+### Live Endpoint
+```
+https://x1327f4041a654297998.sandbox.graphwise.ai/repositories/KRR-Project
+```
+
+**Statistics:**
+- 2.1M+ triples
+- 23 classes
+- Full biomedical knowledge graph
+
+### Local Web Application
 ```bash
 cd scripts
-python webapp_sparql.py --port 5000
+python webapp.py
+# Open http://localhost:5000
 ```
+
+### Features
+- Live SPARQL query execution against GraphDB
+- Interactive graph visualization
+- 12 competency queries
+- D3.js force-directed graph explorer
 
 ### Endpoints
 | Endpoint | Method | Description |

@@ -518,6 +518,76 @@ The reasoner successfully:
     \item Classified SingleAuthorArticle and MultiAuthorArticle
 \end{enumerate}
 
+\subsection{SWRL Rules (Bonus)}
+
+We implemented 7 SWRL (Semantic Web Rule Language) rules for advanced reasoning:
+
+\begin{lstlisting}[language=Python, caption=SWRL Rule Examples]
+# Rule 2: Funded Author Inference
+Author(?a) ^ hasProject(?a, ?p) ^ NIHProject(?p) 
+    -> FundedAuthor(?a)
+
+# Rule 3: Established Researcher
+Author(?a) ^ hasEmployment(?a, ?e) ^ hasEducation(?a, ?d) 
+    -> EstablishedResearcher(?a)
+
+# Rule 4: Collaborative Article
+Article(?art) ^ writtenBy(?art, ?a1) ^ writtenBy(?art, ?a2) 
+    ^ differentFrom(?a1, ?a2) -> CollaborativeArticle(?art)
+
+# Rule 5: Gene-Disease Link Article
+Article(?art) ^ mentionsBioEntity(?art, ?g) ^ Gene(?g) 
+    ^ mentionsBioEntity(?art, ?d) ^ Disease(?d) 
+    -> GeneDiseaseLinkArticle(?art)
+
+# Rule 7: Alumni Peer Connection
+Author(?a1) ^ Author(?a2) ^ hasEducation(?a1, ?e1) 
+    ^ hasEducation(?a2, ?e2) ^ educatedAt(?e1, ?inst) 
+    ^ educatedAt(?e2, ?inst) ^ differentFrom(?a1, ?a2) 
+    -> isAlumniPeerOf(?a1, ?a2)
+\end{lstlisting}
+
+These rules are saved in \texttt{owl/pkg2020\_with\_swrl.owl} and can be executed using Protege's SWRL Tab plugin.
+
+%==============================================================================
+\section{Hand-Annotated Individuals}
+%==============================================================================
+
+As per the rubric requirement, we created 10+ hand-annotated individuals in a separate file (\texttt{pkg2020\_hand\_annotated.owl}) to test our defined classes and reasoning:
+
+\begin{table}[H]
+\centering
+\caption{Hand-Annotated Individuals}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{\#} & \textbf{Individual} & \textbf{Purpose} \\
+\hline
+1 & Article\_HAND\_001 & SingleAuthorArticle test \\
+2 & Article\_HAND\_002 & MultiAuthorArticle test \\
+3 & Author\_HAND\_001 & ActiveAuthor (has careerStartYear) \\
+4 & Author\_HAND\_002 & AnonymousAuthor (no career info) \\
+5 & Author\_HAND\_003 & ActiveAuthor for collaboration \\
+6 & Org\_HAND\_Harvard & Organization with DBpedia link \\
+7 & Inst\_HAND\_MIT & Institution with Wikidata link \\
+8 & Aff\_HAND\_001 & Affiliation with location \\
+9 & Gene\_HAND\_BRCA1 & Gene bioentity \\
+10 & Disease\_HAND\_Cancer & Disease bioentity \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Reasoning Verification}
+
+After running the HermiT reasoner on the hand-annotated individuals:
+
+\begin{itemize}
+    \item \textbf{ActiveAuthor}: Author\_HAND\_001 and Author\_HAND\_003 classified (have careerStartYear)
+    \item \textbf{AnonymousAuthor}: Author\_HAND\_002 classified (no careerStartYear)
+    \item \textbf{SingleAuthorArticle}: Article\_HAND\_001 classified (1 author)
+    \item \textbf{MultiAuthorArticle}: Article\_HAND\_002 classified (3 authors)
+    \item \textbf{FundedAuthor}: Author\_HAND\_001 classified (has NIH project)
+\end{itemize}
+
 %==============================================================================
 \section{SPARQL Queries}
 %==============================================================================
@@ -658,18 +728,31 @@ BioEntities & Varies \\
 \begin{table}[H]
 \centering
 \caption{Generated OWL Files}
-\begin{tabular}{|l|r|}
+\begin{tabular}{|l|r|l|}
 \hline
-\textbf{File} & \textbf{Size} \\
+\textbf{File} & \textbf{Size} & \textbf{Description} \\
 \hline
-pkg2020\_core.owl & 2.6 KB \\
-pkg2020\_constrained.owl & 4.3 KB \\
-pkg2020\_populated\_authors.owl & 3.8 MB \\
-pkg2020\_step4\_affiliations.owl & 7.1 MB \\
-pkg2020\_final.owl & 7.1 MB \\
+pkg2020\_tbox\_only.owl & 14 KB & T-Box only (no individuals) \\
+pkg2020\_hand\_annotated.owl & 19 KB & 10+ hand-annotated individuals \\
+pkg2020\_with\_swrl.owl & 27 KB & T-Box with SWRL rules \\
+pkg2020\_core.owl & 4.2 KB & Core ontology \\
+pkg2020\_constrained.owl & 8.4 KB & With OWL axioms \\
+pkg2020\_populated\_authors.owl & 35 MB & Authors and articles \\
+pkg2020\_step4\_affiliations.owl & 69 MB & With affiliations \\
+pkg2020\_final.owl & 119 MB & Complete populated ontology \\
+pkg2020\_final.ttl & 291 MB & Turtle format for GraphDB \\
 \hline
 \end{tabular}
 \end{table}
+
+\subsection{Ontology Files Summary}
+
+As per the rubric requirement, we submit:
+\begin{enumerate}
+    \item \textbf{T-Box Only}: \texttt{pkg2020\_tbox\_only.owl} - Contains all classes, properties, and axioms without any individuals
+    \item \textbf{With Individuals}: \texttt{pkg2020\_hand\_annotated.owl} - Contains 10+ hand-annotated individuals for testing
+    \item \textbf{Full Population}: \texttt{pkg2020\_final.owl} - Complete dataset populated via Python scripts
+\end{enumerate}
 
 %==============================================================================
 \section{Visualization}
@@ -694,6 +777,42 @@ To visualize the ontology:
     \item Select classes to visualize
     \item Export as image for reports
 \end{enumerate}
+
+\subsection{GraphDB Setup and SPARQL Queries}
+
+To run SPARQL queries via GraphDB:
+
+\begin{enumerate}
+    \item Download GraphDB Free from \url{https://www.ontotext.com/products/graphdb/download/}
+    \item Create a new repository (e.g., ``pkg2020'')
+    \item Import \texttt{owl/pkg2020\_sample.ttl} or \texttt{pkg2020\_final.ttl}
+    \item Navigate to SPARQL $\rightarrow$ Query
+    \item Run the competency queries from Section 9
+\end{enumerate}
+
+Alternatively, use GraphDB Sandbox (cloud-hosted):
+\begin{enumerate}
+    \item Go to \url{https://graphdb.ontotext.com/}
+    \item Create a free account and new repository
+    \item Upload the TTL file via Import $\rightarrow$ RDF
+    \item Access the SPARQL endpoint
+\end{enumerate}
+
+\subsection{Sample GraphDB Query Session}
+
+\begin{lstlisting}[language=SPARQL, caption=GraphDB Query Example]
+# Count all entities by type
+PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+
+SELECT ?type (COUNT(?entity) AS ?count)
+WHERE {
+    ?entity a ?type .
+    FILTER(STRSTARTS(STR(?type), 
+           "http://example.org/pkg2020/"))
+}
+GROUP BY ?type
+ORDER BY DESC(?count)
+\end{lstlisting}
 
 %==============================================================================
 \section{Reflection}

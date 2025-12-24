@@ -439,13 +439,14 @@
     <!-- Header -->
     <header class="header">
         <h1>🧬 PKG2020 Knowledge Graph Explorer</h1>
-        <p class="header-subtitle">Interactive SPARQL Query Interface | 23 Classes | 1.7M+ Triples</p>
+        <p class="header-subtitle">Interactive SPARQL Query Interface | 23 Classes | 2.1M+ Triples | Live GraphDB Connection</p>
     </header>
     
     <!-- Navigation -->
     <nav class="nav-tabs">
         <button class="nav-tab active" onclick="showTab('dashboard')">📊 Dashboard</button>
-        <button class="nav-tab" onclick="showTab('graph')">🕸️ Full Graph (23 Classes)</button>
+        <button class="nav-tab" onclick="showTab('livegraph')">🌐 Live KG Explorer</button>
+        <button class="nav-tab" onclick="showTab('graph')">🕸️ Ontology Schema</button>
         <button class="nav-tab" onclick="showTab('sparql')">💻 SPARQL Query</button>
         <button class="nav-tab" onclick="showTab('competency')">📝 Competency Queries</button>
         <button class="nav-tab" onclick="showTab('proof')">✅ Data Provenance</button>
@@ -476,6 +477,30 @@
             </div>
         </div>
         
+        <!-- Live KG Explorer Tab -->
+        <div id="livegraph" class="tab-content">
+            <div class="panel">
+                <h3 class="panel-title">🌐 Live Knowledge Graph Explorer</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">
+                    Explore real instances from the GraphDB SPARQL endpoint. Select a class to visualize its relationships.
+                </p>
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                    <select id="live-class-select" onchange="loadLiveGraph()">
+                        <option value="Article">Articles</option>
+                        <option value="Author">Authors</option>
+                        <option value="Gene">Genes</option>
+                        <option value="Disease">Diseases</option>
+                        <option value="Organization">Organizations</option>
+                        <option value="Mutation">Mutations</option>
+                    </select>
+                    <input type="number" id="live-limit" value="50" min="10" max="200" style="width: 80px; padding: 0.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.4); color: white;">
+                    <button class="btn btn-primary" onclick="loadLiveGraph()">🔄 Load Graph</button>
+                </div>
+                <div id="live-graph-container" style="width: 100%; height: 600px; background: rgba(0,0,0,0.3); border-radius: 20px; overflow: hidden;"></div>
+                <p id="live-graph-status" style="color: var(--text-muted); margin-top: 1rem; text-align: center;"></p>
+            </div>
+        </div>
+
         <!-- SPARQL Tab -->
         <div id="sparql" class="tab-content">
             <div class="panel">
@@ -490,16 +515,30 @@
                 <textarea id="query-editor" class="query-editor" placeholder="Enter SPARQL query..."></textarea>
             </div>
             
+            <!-- Results Sub-tabs -->
             <div class="panel">
-                <h3 class="panel-title">📊 Query Results</h3>
-                <div id="query-results">
-                    <p style="color: var(--text-muted); text-align: center;">Execute a query to see results</p>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <button class="btn btn-secondary" id="btn-table" onclick="showResultView('table')" style="background: var(--primary);">📋 Table View</button>
+                    <button class="btn btn-secondary" id="btn-graph" onclick="showResultView('graph')">🕸️ Graph View</button>
+                    <button class="btn btn-secondary" id="btn-chart" onclick="showResultView('chart')">📊 Chart View</button>
                 </div>
-            </div>
-            
-            <div class="panel">
-                <h3 class="panel-title">📈 Results Visualization</h3>
-                <div id="results-chart" style="height: 400px;"></div>
+                
+                <div id="result-table-view">
+                    <h4 style="color: var(--text-muted); margin-bottom: 0.5rem;">📋 Query Results</h4>
+                    <div id="query-results">
+                        <p style="color: var(--text-muted); text-align: center;">Execute a query to see results</p>
+                    </div>
+                </div>
+                
+                <div id="result-graph-view" style="display: none;">
+                    <h4 style="color: var(--text-muted); margin-bottom: 0.5rem;">🕸️ Results as Graph</h4>
+                    <div id="results-graph-container" style="width: 100%; height: 500px; background: rgba(0,0,0,0.3); border-radius: 15px;"></div>
+                </div>
+                
+                <div id="result-chart-view" style="display: none;">
+                    <h4 style="color: var(--text-muted); margin-bottom: 0.5rem;">📊 Results Chart</h4>
+                    <div id="results-chart" style="height: 400px;"></div>
+                </div>
             </div>
         </div>
         
@@ -843,6 +882,9 @@
                 
                 const data = await res.json();
                 
+                // Store for graph/chart views
+                currentQueryResults = data;
+                
                 if (data.error) {
                     resultsDiv.innerHTML = `<p style="color: #e94560;">Error: ${data.error}</p>`;
                     return;
@@ -854,7 +896,7 @@
                 }
                 
                 // Build table
-                let html = `<p style="margin-bottom: 1rem; color: var(--text-muted);">${data.count} results</p>`;
+                let html = `<p style="margin-bottom: 1rem; color: var(--text-muted);">${data.count} results from GraphDB</p>`;
                 html += '<div style="overflow-x: auto;"><table class="results-table"><tr>';
                 data.columns.forEach(col => html += `<th>${col}</th>`);
                 html += '</tr>';
@@ -867,9 +909,6 @@
                 html += '</table></div>';
                 
                 resultsDiv.innerHTML = html;
-                
-                // Create results chart
-                createResultsChart(data);
             } catch (e) {
                 resultsDiv.innerHTML = `<p style="color: #e94560;">Error: ${e.message}</p>`;
             }
@@ -992,6 +1031,247 @@
         // Initialize
         loadStats();
         loadQueryDropdown();
+        
+        // Store current query results for graph/chart rendering
+        let currentQueryResults = null;
+        
+        // ============================================================
+        // RESULT VIEW SWITCHING
+        // ============================================================
+        function showResultView(view) {
+            document.getElementById('result-table-view').style.display = view === 'table' ? 'block' : 'none';
+            document.getElementById('result-graph-view').style.display = view === 'graph' ? 'block' : 'none';
+            document.getElementById('result-chart-view').style.display = view === 'chart' ? 'block' : 'none';
+            
+            document.getElementById('btn-table').style.background = view === 'table' ? 'var(--primary)' : 'rgba(255,255,255,0.1)';
+            document.getElementById('btn-graph').style.background = view === 'graph' ? 'var(--primary)' : 'rgba(255,255,255,0.1)';
+            document.getElementById('btn-chart').style.background = view === 'chart' ? 'var(--primary)' : 'rgba(255,255,255,0.1)';
+            
+            if (view === 'graph' && currentQueryResults) {
+                renderResultsAsGraph(currentQueryResults);
+            }
+            if (view === 'chart' && currentQueryResults) {
+                createResultsChart(currentQueryResults);
+            }
+        }
+        
+        // ============================================================
+        // RENDER SPARQL RESULTS AS GRAPH
+        // ============================================================
+        function renderResultsAsGraph(data) {
+            const container = document.getElementById('results-graph-container');
+            container.innerHTML = '';
+            
+            if (!data || data.rows.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 2rem;">No data to visualize as graph</p>';
+                return;
+            }
+            
+            // Build nodes and links from query results
+            const nodes = new Map();
+            const links = [];
+            
+            // If 3 columns (subject, predicate, object pattern)
+            if (data.columns.length >= 3) {
+                data.rows.forEach(row => {
+                    const subject = row[0];
+                    const predicate = row[1];
+                    const object = row[2];
+                    
+                    if (!nodes.has(subject)) {
+                        nodes.set(subject, { id: subject, type: 'subject', color: '#e94560' });
+                    }
+                    if (!nodes.has(object)) {
+                        nodes.set(object, { id: object, type: 'object', color: '#0f3460' });
+                    }
+                    links.push({ source: subject, target: object, label: predicate });
+                });
+            } else {
+                // For other query patterns, create nodes from first column
+                data.rows.forEach((row, i) => {
+                    const id = row[0] || `node_${i}`;
+                    if (!nodes.has(id)) {
+                        nodes.set(id, { id: id, type: 'node', color: '#e94560' });
+                    }
+                    // Link consecutive nodes
+                    if (i > 0 && data.rows[i-1]) {
+                        links.push({ source: data.rows[i-1][0], target: id, label: '' });
+                    }
+                });
+            }
+            
+            const nodesArray = Array.from(nodes.values()).slice(0, 100);
+            const linksFiltered = links.filter(l => nodes.has(l.source) && nodes.has(l.target)).slice(0, 150);
+            
+            const width = container.clientWidth;
+            const height = 500;
+            
+            const svg = d3.select('#results-graph-container')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            const simulation = d3.forceSimulation(nodesArray)
+                .force('link', d3.forceLink(linksFiltered).id(d => d.id).distance(80))
+                .force('charge', d3.forceManyBody().strength(-200))
+                .force('center', d3.forceCenter(width / 2, height / 2));
+            
+            const link = svg.append('g')
+                .selectAll('line')
+                .data(linksFiltered)
+                .enter().append('line')
+                .attr('stroke', '#444')
+                .attr('stroke-width', 1.5);
+            
+            const node = svg.append('g')
+                .selectAll('circle')
+                .data(nodesArray)
+                .enter().append('circle')
+                .attr('r', 12)
+                .attr('fill', d => d.color)
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 2)
+                .call(d3.drag()
+                    .on('start', (e) => { if (!e.active) simulation.alphaTarget(0.3).restart(); e.subject.fx = e.subject.x; e.subject.fy = e.subject.y; })
+                    .on('drag', (e) => { e.subject.fx = e.x; e.subject.fy = e.y; })
+                    .on('end', (e) => { if (!e.active) simulation.alphaTarget(0); e.subject.fx = null; e.subject.fy = null; }));
+            
+            const labels = svg.append('g')
+                .selectAll('text')
+                .data(nodesArray)
+                .enter().append('text')
+                .text(d => d.id.substring(0, 15))
+                .attr('fill', '#fff')
+                .attr('font-size', '8px')
+                .attr('dx', 15)
+                .attr('dy', 3);
+            
+            simulation.on('tick', () => {
+                link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+                node.attr('cx', d => d.x).attr('cy', d => d.y);
+                labels.attr('x', d => d.x).attr('y', d => d.y);
+            });
+        }
+        
+        // ============================================================
+        // LIVE KNOWLEDGE GRAPH EXPLORER
+        // ============================================================
+        async function loadLiveGraph() {
+            const className = document.getElementById('live-class-select').value;
+            const limit = document.getElementById('live-limit').value || 50;
+            const container = document.getElementById('live-graph-container');
+            const status = document.getElementById('live-graph-status');
+            
+            container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            status.textContent = 'Loading from GraphDB...';
+            
+            // Build query based on class
+            let query = `PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
+SELECT ?subject ?predicate ?object
+WHERE {
+    ?subject a pkg:${className} .
+    ?subject ?predicate ?object .
+}
+LIMIT ${limit}`;
+            
+            try {
+                const res = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({query})
+                });
+                
+                const data = await res.json();
+                
+                if (data.error) {
+                    container.innerHTML = `<p style="color: #e94560; text-align: center; padding: 2rem;">Error: ${data.error}</p>`;
+                    status.textContent = '';
+                    return;
+                }
+                
+                status.textContent = `Loaded ${data.count} triples for ${className} instances`;
+                
+                // Render the graph
+                container.innerHTML = '';
+                
+                const nodes = new Map();
+                const links = [];
+                
+                data.rows.forEach(row => {
+                    const subject = row[0];
+                    const predicate = row[1];
+                    const object = row[2];
+                    
+                    if (!nodes.has(subject)) {
+                        nodes.set(subject, { id: subject, type: 'subject', color: '#e94560', size: 20 });
+                    }
+                    if (!nodes.has(object)) {
+                        const isLiteral = object.match(/^[0-9]/) || object.length > 50;
+                        nodes.set(object, { id: object, type: isLiteral ? 'literal' : 'object', color: isLiteral ? '#f39c12' : '#0f3460', size: isLiteral ? 10 : 15 });
+                    }
+                    links.push({ source: subject, target: object, label: predicate });
+                });
+                
+                const nodesArray = Array.from(nodes.values());
+                const width = container.clientWidth;
+                const height = 600;
+                
+                const svg = d3.select('#live-graph-container')
+                    .append('svg')
+                    .attr('width', width)
+                    .attr('height', height);
+                
+                const simulation = d3.forceSimulation(nodesArray)
+                    .force('link', d3.forceLink(links).id(d => d.id).distance(100))
+                    .force('charge', d3.forceManyBody().strength(-150))
+                    .force('center', d3.forceCenter(width / 2, height / 2));
+                
+                const link = svg.append('g')
+                    .selectAll('line')
+                    .data(links)
+                    .enter().append('line')
+                    .attr('stroke', '#444')
+                    .attr('stroke-width', 1.5);
+                
+                const node = svg.append('g')
+                    .selectAll('circle')
+                    .data(nodesArray)
+                    .enter().append('circle')
+                    .attr('r', d => d.size)
+                    .attr('fill', d => d.color)
+                    .attr('stroke', '#fff')
+                    .attr('stroke-width', 2)
+                    .call(d3.drag()
+                        .on('start', (e) => { if (!e.active) simulation.alphaTarget(0.3).restart(); e.subject.fx = e.subject.x; e.subject.fy = e.subject.y; })
+                        .on('drag', (e) => { e.subject.fx = e.x; e.subject.fy = e.y; })
+                        .on('end', (e) => { if (!e.active) simulation.alphaTarget(0); e.subject.fx = null; e.subject.fy = null; }));
+                
+                // Tooltips
+                node.append('title').text(d => d.id);
+                
+                const labels = svg.append('g')
+                    .selectAll('text')
+                    .data(nodesArray.filter(n => n.type === 'subject'))
+                    .enter().append('text')
+                    .text(d => d.id.substring(0, 20))
+                    .attr('fill', '#fff')
+                    .attr('font-size', '9px')
+                    .attr('dx', 15)
+                    .attr('dy', 3);
+                
+                simulation.on('tick', () => {
+                    link.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+                        .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+                    node.attr('cx', d => d.x).attr('cy', d => d.y);
+                    labels.attr('x', d => d.x).attr('y', d => d.y);
+                });
+                
+            } catch (e) {
+                container.innerHTML = `<p style="color: #e94560; text-align: center; padding: 2rem;">Error: ${e.message}</p>`;
+                status.textContent = '';
+            }
+        }
     </script>
 </body>
 </html>
