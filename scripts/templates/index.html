@@ -8,16 +8,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #00ff41;
-            --primary-light: #39ff14;
-            --secondary: #00cc33;
-            --accent: #00ffcc;
-            --bg-dark: #0a0a0a;
-            --bg-card: #111111;
-            --text: #00ff41;
-            --text-muted: #00aa33;
-            --border: #1a1a1a;
-            --glow: 0 0 10px rgba(0, 255, 65, 0.5);
+            --primary: #00d4ff;
+            --primary-light: #00ffff;
+            --secondary: #0099cc;
+            --accent: #ff00ff;
+            --bg-dark: #0a0a0f;
+            --bg-card: #0d0d14;
+            --text: #00d4ff;
+            --text-muted: #0088aa;
+            --border: #1a1a2e;
+            --glow: 0 0 15px rgba(0, 212, 255, 0.6);
+            --graph-bg: #050510;
         }
         
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -446,17 +447,29 @@
             }
         }
         
-        /* Additional graph container styles */
+        /* Additional graph container styles - DARK THEME */
         #live-graph-container {
-            background: #f1f5f9;
-            border: 1px solid var(--border);
+            background: var(--graph-bg);
+            border: 1px solid var(--primary);
             border-radius: 12px;
+            box-shadow: var(--glow);
         }
         
         #results-graph-container {
-            background: #f1f5f9;
-            border: 1px solid var(--border);
+            background: var(--graph-bg);
+            border: 1px solid var(--primary);
             border-radius: 12px;
+            box-shadow: var(--glow);
+        }
+        
+        #graph-container {
+            background: var(--graph-bg);
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            box-shadow: var(--glow);
+            width: 100%;
+            height: 600px;
+            overflow: hidden;
         }
     </style>
 </head>
