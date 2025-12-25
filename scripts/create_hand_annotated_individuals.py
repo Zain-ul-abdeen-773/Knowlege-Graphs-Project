@@ -1,7 +1,10 @@
 """
-Hand-Annotated Individuals for PKG2020 Ontology
-Creates 10+ example individuals manually for testing defined classes and reasoning
-This simulates what would be done in Protégé
+PKG2020 Hand-Annotated Individuals - Manual A-Box for Testing
+PURPOSE: Creates 10+ manually annotated individuals to test defined classes and reasoner classification (simulates Protégé annotation).
+HOW: Loads T-Box, creates sample individuals (Article_HAND_001, Author_HAND_001, Gene_HAND_BRCA1, etc.) with explicit property assertions.
+KEY TEST: Author_HAND_001 has careerStartYear → classified as ActiveAuthor; Author_HAND_002 lacks it → classified as AnonymousAuthor.
+INDIVIDUALS: 2 Articles, 3 Authors, 1 Organization (Harvard→DBpedia), 1 Institution (MIT→Wikidata), Gene, Disease, NIHProject.
+OUTPUT: Saves pkg2020_hand_annotated.owl and pkg2020_hand_annotated_reasoned.owl (after running HermiT reasoner).
 """
 from owlready2 import *
 

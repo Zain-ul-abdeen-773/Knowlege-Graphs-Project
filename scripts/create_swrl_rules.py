@@ -1,6 +1,10 @@
 """
-SWRL Rules for PKG2020 Ontology
-Demonstrates rule-based reasoning as per the bonus criteria
+PKG2020 SWRL Rules - Rule-Based Reasoning (Bonus Feature)
+PURPOSE: Implements 7 SWRL (Semantic Web Rule Language) rules for inferring new knowledge from existing facts.
+HOW: Uses OWLReady2 Imp() class to create IF-THEN rules with antecedent (body) → consequent (head) structure.
+RULES: FundedAuthor (has NIH project), EstablishedResearcher (has employment AND education), CollaborativeArticle (2+ authors).
+        GeneDiseaseLinkArticle (mentions Gene AND Disease), AlumniPeer (same institution education).
+OUTPUT: Saves pkg2020_with_swrl.owl. Rules can be executed in Protégé SWRL Tab or via SPARQL CONSTRUCT queries.
 """
 from owlready2 import *
 

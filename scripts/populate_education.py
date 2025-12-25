@@ -1,3 +1,11 @@
+"""
+PKG2020 Education Population - Academic Background Data
+PURPOSE: Creates Education and Institution individuals from OA06_Researcher_Education.csv, linking authors to their academic history.
+HOW: Loads authors, creates Education records (degree, startYear, endYear), Institution entities, links via hasEducation and educatedAt.
+KEY FEATURE: Enables CQ12 (authors with PhDs), CQ10 (top institutions), supports SWRL AlumniPeer rule (same institution = peers).
+DATA: Degrees (PhD, Masters), institutions (universities), graduation years - enables academic network analysis.
+OUTPUT: Saves pkg2020_step6_education_populated.owl - completes author academic profiles.
+"""
 import pandas as pd
 import os
 import random

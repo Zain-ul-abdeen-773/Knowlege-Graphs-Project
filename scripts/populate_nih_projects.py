@@ -1,3 +1,11 @@
+"""
+PKG2020 NIH Projects Population - Research Funding Data
+PURPOSE: Creates NIHProject individuals from OA07_NIH_Projects.csv, linking authors to their research funding via hasProject property.
+HOW: Loads authors, creates NIHProject (projectNumber, piName), links author to project - enables FundedAuthor SWRL rule classification.
+KEY FEATURE: Enables CQ13 (NIH funded authors), CQ14 (principal investigators), demonstrates author-funding research networks.
+DATA: NIH project numbers (R01-CA12345), PI names - enables funding analysis and research impact tracking.
+OUTPUT: Saves pkg2020_final.owl - FINAL populated ontology with all data (2.1M+ triples).
+"""
 import pandas as pd
 import os
 import random

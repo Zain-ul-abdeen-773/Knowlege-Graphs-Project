@@ -1,3 +1,11 @@
+"""
+PKG2020 Author & Article Population - Core Data Population Script
+PURPOSE: Populates ontology with Article, Author, and Authorship individuals from OA01_Author_List.csv (50K rows).
+HOW: Reads CSV with pandas, creates Article (by PMID), Author (by AND_ID), links via writtenBy property, reifies with Authorship for author order.
+KEY LOGIC: Uses caching (author_cache, article_cache) to prevent duplicate individuals, handles FunctionalProperty (hasPMID) correctly.
+DATA CREATED: ~15K unique articles, ~25K unique authors, ~50K authorship records with semantic relationships.
+OUTPUT: Saves pkg2020_populated_authors.owl - first step in population pipeline.
+"""
 import pandas as pd
 from owlready2 import *
 import gc

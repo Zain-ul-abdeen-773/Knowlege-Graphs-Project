@@ -1,6 +1,10 @@
 """
-SPARQL Queries for PKG2020 KRR Ontology
-15 Competency questions answered via SPARQL
+PKG2020 SPARQL Competency Queries - 15 Validated Queries
+PURPOSE: Contains 15 SPARQL queries answering competency questions to validate knowledge graph utility and completeness.
+HOW: Each query stored in SPARQL_QUERIES dict with name as key; uses PREFIX pkg: <http://example.org/pkg2020/ontology.owl#> namespace.
+QUERY CATEGORIES: Authors (CQ1-3), Articles & BioEntities (CQ4-7), Organizations (CQ8-9), Career (CQ10-12), NIH Funding (CQ13-14), Complete Profile (CQ15).
+TECHNIQUES: GROUP BY/HAVING for aggregation, OPTIONAL for partial data, FILTER for constraints, COUNT/DISTINCT for statistics.
+USAGE: Run standalone to print queries, or import SPARQL_QUERIES dict in webapp.py for API endpoints.
 """
 
 # Note: To run these queries, load the OWL file into a SPARQL endpoint like:

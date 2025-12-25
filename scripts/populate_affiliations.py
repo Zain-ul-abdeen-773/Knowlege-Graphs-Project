@@ -1,3 +1,11 @@
+"""
+PKG2020 Affiliations Population - Author-Organization Linking
+PURPOSE: Creates Affiliation and Organization individuals, links authors to their institutional affiliations using OA04_Affiliations.csv.
+HOW: Loads existing authors from ontology, creates Affiliation (with city/state/country), Organization entities, links via hasAffiliation and affiliatedWith.
+KEY FEATURE: Sanitizes organization names for valid OWL IRIs, handles geographic data (City, State, Country) as data properties.
+DATA CREATED: ~50K affiliation records linking authors to research organizations worldwide.
+OUTPUT: Saves pkg2020_step4_affiliations_populated.owl - extends author data with institutional relationships.
+"""
 import pandas as pd
 import re
 import os

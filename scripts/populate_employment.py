@@ -1,3 +1,11 @@
+"""
+PKG2020 Employment Population - Career History Data
+PURPOSE: Creates Employment individuals linking authors to their work history using OA05_Researcher_Employment.csv (50K rows).
+HOW: Loads existing authors, creates Employment records with startYear, endYear, jobTitle, links to Organization via employedAt property.
+KEY FEATURE: Captures temporal career data enabling timeline queries (CQ11), supports career analysis across organizations.
+DATA: Job titles, employment periods, employer organizations - enables queries like "authors who worked at Harvard in 2020".
+OUTPUT: Saves pkg2020_step5_employment_populated.owl - adds professional history to author profiles.
+"""
 import pandas as pd
 import os
 import random

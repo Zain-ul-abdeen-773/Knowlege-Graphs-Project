@@ -1,6 +1,10 @@
 """
-Linking to External Datasets (DBpedia, WikiData)
-Links organizations and institutions to external knowledge bases
+PKG2020 External Data Linking - 5-Star Linked Data Integration
+PURPOSE: Links Organization and Institution entities to external knowledge bases (DBpedia, Wikidata) for 5-star Linked Data compliance.
+HOW: Generates DBpedia URIs (http://dbpedia.org/resource/...) for organizations, Wikidata search URLs for institutions using name normalization.
+PROPERTIES: Creates dbpediaLink and wikidataLink data properties, sameAs object property (owl:sameAs equivalent) for semantic linking.
+FEDERATED QUERIES: Includes sample SPARQL CONSTRUCT for querying DBpedia abstracts about linked organizations.
+OUTPUT: Saves pkg2020_linked.owl with external links - demonstrates interoperability with global Linked Data cloud.
 """
 import re
 from owlready2 import *

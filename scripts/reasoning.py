@@ -1,6 +1,10 @@
 """
-Reasoning and Consistency Checking Script
-Uses HermiT reasoner via OWLReady2
+PKG2020 Reasoning & Consistency Checking - OWL Reasoner Script
+PURPOSE: Runs HermiT reasoner to check ontology consistency and classify individuals into defined classes (ActiveAuthor, ProlificAuthor, etc.).
+HOW: Uses OWLReady2's sync_reasoner() with infer_property_values=True to compute class membership based on equivalent_to definitions.
+KEY CHECKS: Validates functional properties (hasPMID), cardinality constraints (min 1 author), detects inconsistencies if axioms conflict.
+INFERENCES: Authors with careerStartYear → ActiveAuthor; Authors with 5+ articles → ProlificAuthor; Articles with 1 author → SingleAuthorArticle.
+OUTPUT: Reports classification counts and validates ontology consistency - critical for demonstrating OWL reasoning capabilities.
 """
 from owlready2 import *
 import sys

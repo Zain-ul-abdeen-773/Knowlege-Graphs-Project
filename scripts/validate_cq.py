@@ -1,6 +1,10 @@
 """
-Validate Competency Questions - Test all SPARQL queries against GraphDB
-This script tests each competency question query and reports which ones return results.
+PKG2020 Competency Question Validation - Live Query Testing
+PURPOSE: Executes all 15 competency queries against live GraphDB endpoint and reports pass/fail status with sample results.
+HOW: Uses SPARQLWrapper with HTTP Basic Auth to connect to GraphDB Sandbox, runs each query, counts results, displays summary.
+AUTHENTICATION: Uses GRAPHDB_ENDPOINT, GRAPHDB_USERNAME, GRAPHDB_PASSWORD for authenticated SPARQL access.
+OUTPUT: For each CQ: ✅ PASSED (N results) with sample, ⚠️ NO RESULTS, or ❌ QUERY ERROR. Final summary shows pass/fail counts.
+USAGE: Run standalone to validate all queries work correctly before demo/viva presentation.
 """
 from SPARQLWrapper import SPARQLWrapper, JSON
 import sys

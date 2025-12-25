@@ -1,3 +1,11 @@
+"""
+PKG2020 Ontology Constraints - OWL Axioms and Defined Classes
+PURPOSE: Adds cardinality restrictions, defined classes (union, intersection, complement) to the core ontology.
+HOW: Loads pkg2020_core.owl, applies axioms: writtenBy.min(1), hasPMID.exactly(1), hasStatus.max(1).
+KEY CLASSES: ActiveAuthor (Author ⊓ ∃careerStartYear), AnonymousAuthor (Author ⊓ ¬ActiveAuthor), ResearchEntity (Author ⊔ Article).
+ADDITIONAL: ProlificAuthor (5+ articles), SingleAuthorArticle, MultiAuthorArticle - all classified by reasoner.
+OUTPUT: Saves pkg2020_constrained.owl with all axioms and defined classes.
+"""
 from owlready2 import *
 
 onto = get_ontology("../owl/pkg2020_core.owl").load()

@@ -1,3 +1,11 @@
+"""
+PKG2020 BioEntity Population - Biomedical Entity Data (Genes, Diseases, Mutations)
+PURPOSE: Creates Gene, Chemical, Disease, Species, Mutation individuals from OA02 and OA03 CSV files, links to articles via mentionsBioEntity.
+HOW: Uses SYNTHETIC MAPPING (modulo on article list) since CSV lacks direct PMID links; creates proper BioEntity subclass based on Type column.
+KEY FEATURE: Enables CQ4 (articles with genes), CQ5 (species), CQ6 (gene-mutation correlations), CQ7 (entity distribution analysis).
+DATA: ~100K bio-entities including genes (BRCA1), chemicals, diseases (cancer), mutations - core biomedical knowledge.
+OUTPUT: Saves pkg2020_step7_bioentities_populated.owl - adds rich biomedical semantic layer to articles.
+"""
 import pandas as pd
 import os
 from owlready2 import *

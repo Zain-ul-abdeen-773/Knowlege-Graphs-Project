@@ -1,6 +1,10 @@
 """
-PKG2020 Knowledge Graph - Web Application with GraphDB SPARQL Endpoint
-Uses external GraphDB Sandbox for live SPARQL queries with authentication
+PKG2020 Knowledge Graph Web Application - Flask + GraphDB Integration (BONUS)
+PURPOSE: Interactive web dashboard for exploring the biomedical knowledge graph with live SPARQL queries and D3.js visualization.
+HOW: Flask backend proxies authenticated SPARQL queries to GraphDB Sandbox, serves HTML/JS frontend with graph explorer and query builder.
+ENDPOINTS: / (dashboard), /sparql (raw SPARQL), /api/query (execute query), /api/stats (graph statistics), /api/competency-queries (15 CQs).
+VISUALIZATION: D3.js force-directed graph showing 23 classes and their relationships, interactive query results table, entity statistics.
+DEPLOYMENT: Configured for Heroku (Procfile), connects to GraphDB at https://x1327f4041a654297998.sandbox.graphwise.ai/repositories/KRR-Project.
 """
 from flask import Flask, request, jsonify, Response, render_template
 from flask_cors import CORS

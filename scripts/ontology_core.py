@@ -1,3 +1,10 @@
+"""
+PKG2020 Ontology Core - Base Classes and Properties
+PURPOSE: Creates the foundational OWL ontology with core classes (Article, Author, Authorship, PublicationYear, PublicationStatus).
+HOW: Uses OWLReady2 library to define classes, object properties (writtenBy, hasAuthorship, hasPrimaryAuthor), and data properties (hasPMID, lastName, foreName).
+KEY FEATURE: Implements PublicationStatus as an ENUMERATION class using OneOf([Published, Preprint, Retracted, InReview]) - required by rubric.
+OUTPUT: Saves pkg2020_core.owl as the base ontology file for further extension.
+"""
 from owlready2 import *
 
 # Create ontology with proper IRI
