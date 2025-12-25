@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PKG2020 Knowledge Graph - Interactive Pipeline Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0f2847 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            padding: 3rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle { color: #888; font-size: 1.1rem; }
+        
+        /* Progress Bar */
+        .progress-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            height: 8px;
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            border-radius: 20px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: #00d4ff;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        /* Step Navigation */
+        .step-nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        
+        .step-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .step-dot:hover { background: rgba(0,212,255,0.2); border-color: #00d4ff; }
+        .step-dot.active { background: linear-gradient(135deg, #00d4ff, #7b2cbf); border-color: #00d4ff; }
+        .step-dot.completed { background: #00d4ff; border-color: #00d4ff; }
+        
+        /* Step Content */
+        .step-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .step-content.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .step-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .step-number {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .step-title { font-size: 1.8rem; font-weight: 600; }
+        .step-file { color: #00d4ff; font-size: 0.9rem; margin-top: 0.25rem; }
+        
+        .section { margin-bottom: 2rem; }
+        .section-title {
+            color: #00d4ff;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-title::before {
+            content: '▸';
+            color: #7b2cbf;
+        }
+        
+        .info-box {
+            background: rgba(0,212,255,0.1);
+            border-left: 4px solid #00d4ff;
+            padding: 1rem;
+            border-radius: 0 10px 10px 0;
+            margin: 1rem 0;
+        }
+        
+        .warning-box {
+            background: rgba(255,193,7,0.1);
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            border-radius: 0 10px 10px 0;
+            margin: 1rem 0;
+        }
+        
+        .code-block {
+            background: #0d1117;
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin: 1rem 0;
+        }
+        
+        .code-block .keyword { color: #ff79c6; }
+        .code-block .class { color: #8be9fd; }
+        .code-block .string { color: #f1fa8c; }
+        .code-block .comment { color: #6272a4; }
+        .code-block .function { color: #50fa7b; }
+        
+        ul, ol { padding-left: 1.5rem; }
+        li { margin: 0.5rem 0; line-height: 1.6; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        th { background: rgba(0,212,255,0.2); color: #00d4ff; }
+        tr:hover { background: rgba(255,255,255,0.05); }
+        
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .nav-btn {
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-btn.prev {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        
+        .nav-btn.next {
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            color: #fff;
+        }
+        
+        .nav-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(0,212,255,0.3); }
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+        
+        /* Flow Diagram */
+        .flow-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .flow-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .flow-box {
+            background: rgba(255,255,255,0.1);
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            flex: 1;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .flow-arrow {
+            color: #00d4ff;
+            font-size: 1.5rem;
+        }
+        
+        .highlight { color: #00d4ff; font-weight: 600; }
+        .code { background: rgba(0,0,0,0.3); padding: 0.2rem 0.5rem; border-radius: 4px; font-family: monospace; }
+        
+        /* Command Box */
+        .command-box {
+            background: #0d1117;
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: monospace;
+            margin: 1rem 0;
+            border: 1px solid #30363d;
+        }
+        
+        .command-box::before {
+            content: '$ ';
+            color: #7b2cbf;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔬 PKG2020 Knowledge Graph Pipeline</h1>
+            <p class="subtitle">Interactive Step-by-Step Guide for Knowledge Representation & Reasoning</p>
+        </header>
+        
+        <div class="progress-text">Step <span id="currentStep">1</span> of <span id="totalSteps">9</span></div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="step-nav" id="stepNav"></div>
+        
+        <div id="stepsContainer">
+            
+            <!-- STEP 0: Overview -->
+            <div class="step-content" data-step="0">
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">📋</div>
+                        <div>
+                            <div class="step-title">Project Overview</div>
+                            <div class="step-file">Understanding Knowledge Graphs</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">What is this Project?</h3>
+                        <p>This is a <span class="highlight">Knowledge Representation and Reasoning (KRR)</span> project that builds an <span class="highlight">OWL/RDF Knowledge Graph</span> from the PKG2020S4 (PubMed Knowledge Graph) dataset.</p>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Why Knowledge Graphs?</h3>
+                        <ul>
+                            <li><strong>Semantic Querying:</strong> Query data using meaningful relationships, not just table joins</li>
+                            <li><strong>Automated Reasoning:</strong> Infer new facts from existing data automatically</li>
+                            <li><strong>Linked Data:</strong> Connect to external knowledge bases (DBpedia, Wikidata)</li>
+                            <li><strong>FAIR Principles:</strong> Findable, Accessible, Interoperable, Reusable data</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Pipeline Overview</h3>
+                        <div class="flow-diagram">
+                            <div class="flow-item"><div class="flow-box">📁 CSV Files</div><span class="flow-arrow">→</span><div class="flow-box">📐 T-Box (Schema)</div></div>
+                            <div class="flow-item"><div class="flow-box">📐 T-Box</div><span class="flow-arrow">→</span><div class="flow-box">🔒 Constraints</div></div>
+                            <div class="flow-item"><div class="flow-box">🔒 Constraints</div><span class="flow-arrow">→</span><div class="flow-box">📊 A-Box (Data)</div></div>
+                            <div class="flow-item"><div class="flow-box">📊 A-Box</div><span class="flow-arrow">→</span><div class="flow-box">🧠 Reasoning</div></div>
+                            <div class="flow-item"><div class="flow-box">🧠 Reasoning</div><span class="flow-arrow">→</span><div class="flow-box">🔗 External Links</div></div>
+                            <div class="flow-item"><div class="flow-box">🔗 Linked Data</div><span class="flow-arrow">→</span><div class="flow-box">🌐 SPARQL Web App</div></div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Data Sources (7 CSV Files)</h3>
+                        <table>
+                            <tr><th>File</th><th>Description</th><th>Purpose</th></tr>
+                            <tr><td>OA01_Author_List.csv</td><td>Authors & articles</td><td>Core publication data</td></tr>
+                            <tr><td>OA02_Bio_entities_Main.csv</td><td>Genes, diseases, chemicals</td><td>Bio-medical entities</td></tr>
+                            <tr><td>OA03_Bio_entities_Mutation.csv</td><td>Mutations</td><td>Mutation research</td></tr>
+                            <tr><td>OA04_Affiliations.csv</td><td>Author affiliations</td><td>Organizational data</td></tr>
+                            <tr><td>OA05_Researcher_Employment.csv</td><td>Employment history</td><td>Career tracking</td></tr>
+                            <tr><td>OA06_Researcher_Education.csv</td><td>Education records</td><td>Academic background</td></tr>
+                            <tr><td>OA07_NIH_Projects.csv</td><td>NIH funding</td><td>Research funding</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- STEP 1: Ontology Core -->
+            <div class="step-content" data-step="1">
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <div>
+                            <div class="step-title">Ontology Core Design (T-Box)</div>
+                            <div class="step-file">📄 scripts/ontology_core.py → owl/pkg2020_core.owl</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box">
+                        <strong>T-Box (Terminological Box)</strong> = The schema/vocabulary of your knowledge graph. Defines WHAT types of things exist (Classes) and WHAT relationships exist (Properties).
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Why Design T-Box First?</h3>
+                        <ul>
+                            <li><strong>Blueprint:</strong> Like a database schema before adding data</li>
+                            <li><strong>Consistency:</strong> All data follows the same structure</li>
+                            <li><strong>Reasoning:</strong> Reasoner needs schema to infer facts</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Classes Created (20+ Required)</h3>
+                        <table>
+                            <tr><th>Category</th><th>Classes</th></tr>
+                            <tr><td>Core</td><td>Article, Author, Authorship, PublicationYear</td></tr>
+                            <tr><td>Organizational</td><td>Organization, Institution, Affiliation</td></tr>
+                            <tr><td>Career</td><td>Employment, Education, NIHProject</td></tr>
+                            <tr><td>Bio-Medical</td><td>BioEntity, Gene, Chemical, Disease, Species, Mutation</td></tr>
+                            <tr><td>Special</td><td>PublicationStatus (Enumeration)</td></tr>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Code Example: Enumeration Class</h3>
+                        <div class="code-block">
+<span class="keyword">class</span> <span class="class">PublicationStatus</span>(Thing):
+    <span class="string">"""Enumeration of publication statuses"""</span>
+    <span class="keyword">pass</span>
+
+<span class="comment"># Create enumeration individuals</span>
+published = PublicationStatus(<span class="string">"Published"</span>)
+preprint = PublicationStatus(<span class="string">"Preprint"</span>)
+retracted = PublicationStatus(<span class="string">"Retracted"</span>)
+in_review = PublicationStatus(<span class="string">"InReview"</span>)
+
+<span class="comment"># Define as closed set (OneOf)</span>
+PublicationStatus.equivalent_to = [OneOf([published, preprint, retracted, in_review])]
+                        </div>
+                        <p><strong>Why?</strong> Limits publication status to ONLY these 4 values. No other status is valid.</p>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Code Example: Functional Property</h3>
+                        <div class="code-block">
+<span class="keyword">class</span> <span class="class">hasPrimaryAuthor</span>(ObjectProperty, FunctionalProperty):
+    <span class="string">"""Functional: Article has exactly one primary author"""</span>
+    domain = [Article]
+    range = [Author]
+                        </div>
+                        <p><strong>Why Functional?</strong> Each article has EXACTLY ONE primary author - prevents duplicates.</p>
+                    </div>
+                    
+                    <div class="command-box">python ontology_core.py</div>
+                </div>
+            </div>
+            
+            <!-- STEP 2: Constraints -->
+            <div class="step-content" data-step="2">
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <div>
+                            <div class="step-title">Adding Constraints & Defined Classes</div>
+                            <div class="step-file">📄 scripts/ontology_constraints.py → owl/pkg2020_constrained.owl</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box">
+                        This step adds <strong>OWL axioms</strong> (logical rules) that define constraints on data and create <strong>defined classes</strong> for automated classification.
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">How Files Are Merged</h3>
+                        <div class="code-block">
+<span class="comment"># Load previous ontology and BUILD UPON it</span>
+onto = get_ontology(<span class="string">"../owl/pkg2020_core.owl"</span>).load()
+                        </div>
+                        <p><strong>Why?</strong> Each script loads the output of the previous step and adds more content.</p>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Axiom 1: Inverse Functional Property</h3>
+                        <div class="code-block">
+hasPMID.is_a.append(InverseFunctionalProperty)
+                        </div>
+                        <p><strong>Meaning:</strong> PMID uniquely identifies an article. If two articles have same PMID, they are the SAME article.</p>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Axiom 2: Cardinality Restrictions</h3>
+                        <div class="code-block">
+Article.is_a.append(writtenBy.<span class="function">min</span>(1, Author))     <span class="comment"># At least 1 author</span>
+Article.is_a.append(hasPMID.<span class="function">exactly</span>(1, str))      <span class="comment"># Exactly 1 PMID</span>
+Article.is_a.append(hasStatus.<span class="function">max</span>(1, PublicationStatus))  <span class="comment"># At most 1 status</span>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Defined Class: Intersection (AND - ⊓)</h3>
+                        <div class="code-block">
+<span class="keyword">class</span> <span class="class">ActiveAuthor</span>(Author):
+    <span class="string">"""Author with known career start year"""</span>
+    equivalent_to = [Author & careerStartYear.some(int)]
+                        </div>
+                        <p><strong>Meaning:</strong> ActiveAuthor = Author WHO HAS a career start year. Reasoner automatically classifies matching authors.</p>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Defined Class: Union (OR - ⊔)</h3>
+                        <div class="code-block">
+<span class="keyword">class</span> <span class="class">ResearchEntity</span>(Thing):
+    equivalent_to = [Author | Article]
+                        </div>
+                        <p><strong>Meaning:</strong> ResearchEntity = Author OR Article. Query all research-related entities together.</p>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Defined Class: Complement (NOT - ¬)</h3>
+                        <div class="code-block">
+<span class="keyword">class</span> <span class="class">AnonymousAuthor</span>(Author):
+    equivalent_to = [Author & Not(ActiveAuthor)]
+                        </div>
+                        <p><strong>Meaning:</strong> AnonymousAuthor = Author who is NOT an ActiveAuthor (no career info).</p>
+                    </div>
+                    
+                    <div class="command-box">python ontology_constraints.py</div>
+                </div>
+            </div>
+            
+            <!-- STEP 3: Population -->
+            <div class="step-content" data-step="3">
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <div>
+                            <div class="step-title">Data Population (A-Box)</div>
+                            <div class="step-file">📄 6 populate_*.py scripts → owl/pkg2020_final.owl</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box">
+                        <strong>A-Box (Assertional Box)</strong> = The actual data instances in your knowledge graph. Contains real articles, authors, organizations following the T-Box structure.
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Population Chain (IN ORDER!)</h3>
+                        <div class="flow-diagram">
+                            <div class="flow-item"><div class="flow-box">1. populate_authors_articles.py</div></div>
+                            <div class="flow-item"><span class="flow-arrow">↓</span></div>
+                            <div class="flow-item"><div class="flow-box">2. populate_affiliations.py</div></div>
+                            <div class="flow-item"><span class="flow-arrow">↓</span></div>
+                            <div class="flow-item"><div class="flow-box">3. populate_employment.py</div></div>
+                            <div class="flow-item"><span class="flow-arrow">↓</span></div>
+                            <div class="flow-item"><div class="flow-box">4. populate_education.py</div></div>
+                            <div class="flow-item"><span class="flow-arrow">↓</span></div>
+                            <div class="flow-item"><div class="flow-box">5. populate_bioentities.py</div></div>
+                            <div class="flow-item"><span class="flow-arrow">↓</span></div>
+                            <div class="flow-item"><div class="flow-box">6. populate_nih_projects.py</div></div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">How Files Are Merged (Chain Loading)</h3>
+                        <div class="code-block">
+<span class="comment"># Script 1: populate_authors_articles.py</span>
+onto = get_ontology(<span class="string">"pkg2020_constrained.owl"</span>).load()
+<span class="comment"># ... add data ...</span>
+onto.save(<span class="string">"pkg2020_populated_authors.owl"</span>)
+
+<span class="comment"># Script 2: populate_affiliations.py</span>
+onto = get_ontology(<span class="string">"pkg2020_populated_authors.owl"</span>).load()  <span class="comment"># Loads previous!</span>
+<span class="comment"># ... add more data ...</span>
+onto.save(<span class="string">"pkg2020_step4_affiliations_populated.owl"</span>)
+                        </div>
+                    </div>
+                    
+                    <div class="warning-box">
+                        <strong>Why Chain Loading?</strong>
+                        <ul>
+                            <li><strong>Incremental building:</strong> Each step adds to existing data</li>
+                            <li><strong>Memory efficient:</strong> Don't need all data in memory at once</li>
+                            <li><strong>Error isolation:</strong> If one step fails, previous data is safe</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Example: Creating Instances</h3>
+                        <div class="code-block">
+<span class="comment"># Create Article instance</span>
+article = Article(f<span class="string">"Article_{pmid}"</span>)
+article.hasPMID = pmid
+
+<span class="comment"># Create Author instance</span>
+author = Author(f<span class="string">"Author_{and_id}"</span>)
+author.lastName = [row[<span class="string">"LastName"</span>]]
+
+<span class="comment"># Create Authorship (reified relationship)</span>
+authorship = Authorship(f<span class="string">"Authorship_{pmid}_{and_id}"</span>)
+authorship.authorOrder = [int(row[<span class="string">"AuOrder"</span>])]
+
+<span class="comment"># Link them</span>
+article.writtenBy.append(author)
+article.hasAuthorship.append(authorship)
+                        </div>
+                    </div>
+                    
+                    <div class="command-box">python populate_authors_articles.py && python populate_affiliations.py && ...</div>
+                </div>
+            </div>
+            
+            <!-- STEP 4: Reasoning -->
+            <div class="step-content" data-step="4">
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">4</div>
+                        <div>
+                            <div class="step-title">Reasoning & Validation</div>
+                            <div class="step-file">📄 scripts/reasoning.py (HermiT Reasoner)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box">
+                        <strong>Reasoning</strong> = Automatically inferring NEW FACTS from existing data (A-Box) and ontology rules (T-Box axioms).
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">How Reasoning Works</h3>
+                        <div class="code-block">
+<span class="keyword">from</span> owlready2 <span class="keyword">import</span> sync_reasoner
+
+<span class="keyword">with</span> onto:
+    sync_reasoner(infer_property_values=<span class="keyword">True</span>)
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">What Gets Inferred?</h3>
+                        <table>
+                            <tr><th>Before Reasoning</th><th>After Reasoning</th></tr>
+                            <tr>
+                                <td>
+                                    Author_12345<br>
+                                    - lastName: "Smith"<br>
+                                    - careerStartYear: 2010
+                                </td>
+                                <td>
+                                    Author_12345<br>
+                                    - lastName: "Smith"<br>
+                                    - careerStartYear: 2010<br>
+                                    - <span class="highlight">[INFERRED] type: ActiveAuthor</span>
+                                </td>
+                            </tr>
+                        </table>
+                        <p><strong>Why?</strong> We defined: <code>ActiveAuthor = Author & careerStartYear.some(int)</code>. Reasoner sees Author_12345 HAS careerStartYear, so it MUST be ActiveAuthor.</p>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Consistency Checking</h3>
+                        <div class="code-block">
+<span class="keyword">try</span>:
+    sync_reasoner()
+    <span class="function">print</span>(<span class="string">"✅ Ontology is CONSISTENT"</span>)
+<span class="keyword">except</span> OwlReadyInconsistentOntologyError:
+    <span class="function">print</span>(<span class="string">"❌ INCONSISTENT - logical contradiction found!"</span>)
+                        </div>
+                    </div>
+                    
+                    <div class="command-box">python reasoning.py</div>
+                </div>
+            </div>
+            
+            <!-- STEP 5: External Linking -->
+            <div class="step-content" data-step="5">
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">5</div>
+                        <div>
+                            <div class="step-title">External Linking (5-Star Linked Data)</div>
+                            <div class="step-file">📄 scripts/link_external_data.py → owl/pkg2020_linked.owl</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box">
+                        Connecting YOUR knowledge graph to EXTERNAL knowledge bases like <strong>DBpedia</strong> (Wikipedia structured data) and <strong>Wikidata</strong>.
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">5-Star Linked Data Principles</h3>
+                        <table>
+                            <tr><th>Star</th><th>Requirement</th><th>Our Implementation</th></tr>
+                            <tr><td>⭐</td><td>Available on web</td><td>Flask web app</td></tr>
+                            <tr><td>⭐⭐</td><td>Machine-readable</td><td>OWL/RDF format</td></tr>
+                            <tr><td>⭐⭐⭐</td><td>Non-proprietary</td><td>RDF/XML, Turtle</td></tr>
+                            <tr><td>⭐⭐⭐⭐</td><td>URIs for identification</td><td>http://example.org/pkg2020/...</td></tr>
+                            <tr><td>⭐⭐⭐⭐⭐</td><td>Links to external data</td><td>DBpedia, Wikidata</td></tr>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">How Linking Works</h3>
+                        <div class="code-block">
+<span class="keyword">def</span> <span class="function">generate_dbpedia_uri</span>(name):
+    clean_name = name.replace(<span class="string">' '</span>, <span class="string">'_'</span>)
+    <span class="keyword">return</span> f<span class="string">"http://dbpedia.org/resource/{clean_name}"</span>
+
+<span class="comment"># Link organizations</span>
+<span class="keyword">for</span> org <span class="keyword">in</span> Organization.instances():
+    dbpedia_uri = generate_dbpedia_uri(org.name)
+    org.dbpediaLink = [dbpedia_uri]
+                        </div>
+                        <p><strong>Example:</strong> Organization: Harvard_University → http://dbpedia.org/resource/Harvard_University</p>
+                    </div>
+                    
+                    <div class="command-box">python link_external_data.py</div>
+                </div>
+            </div>
+            
+            <!-- STEP 6: SPARQL -->
+            <div class="step-content" data-step="6">
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">6</div>
+                        <div>
+                            <div class="step-title">SPARQL Competency Queries</div>
+                            <div class="step-file">📄 scripts/sparql_queries.py (15 Queries)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box">
+                        <strong>SPARQL</strong> = SPARQL Protocol and RDF Query Language. It's like SQL for knowledge graphs - pattern matching on triples.
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">15 Competency Questions</h3>
+                        <table>
+                            <tr><th>#</th><th>Question</th><th>Type</th></tr>
+                            <tr><td>1</td><td>Authors in multiple institutions</td><td>Aggregation</td></tr>
+                            <tr><td>2</td><td>Prolific authors (article count)</td><td>Ranking</td></tr>
+                            <tr><td>3</td><td>Author collaborations</td><td>Network</td></tr>
+                            <tr><td>4-5</td><td>Articles with genes/diseases</td><td>Bio-medical</td></tr>
+                            <tr><td>6</td><td>Mutation-disease correlation</td><td>Research</td></tr>
+                            <tr><td>7</td><td>Bio-entity distribution</td><td>Statistics</td></tr>
+                            <tr><td>8-9</td><td>Top organizations, Geographic</td><td>Affiliation</td></tr>
+                            <tr><td>10-12</td><td>Education, Employment, PhDs</td><td>Career</td></tr>
+                            <tr><td>13-14</td><td>NIH funding, PIs</td><td>Funding</td></tr>
+                            <tr><td>15</td><td>Complete author profile</td><td>Summary</td></tr>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Example SPARQL Query</h3>
+                        <div class="code-block">
+<span class="comment"># CQ2: Most prolific authors</span>
+<span class="keyword">PREFIX</span> pkg: &lt;http://example.org/pkg2020/ontology.owl#&gt;
+
+<span class="keyword">SELECT</span> ?author ?lastName (<span class="function">COUNT</span>(?article) <span class="keyword">AS</span> ?articleCount)
+<span class="keyword">WHERE</span> {
+    ?author a pkg:Author .              <span class="comment"># Find all Authors</span>
+    ?author pkg:lastName ?lastName .    <span class="comment"># Get their last name</span>
+    ?article pkg:writtenBy ?author .    <span class="comment"># Find articles they wrote</span>
+}
+<span class="keyword">GROUP BY</span> ?author ?lastName
+<span class="keyword">ORDER BY DESC</span>(?articleCount)
+<span class="keyword">LIMIT</span> 50
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- STEP 7: Web App -->
+            <div class="step-content" data-step="7">
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">7</div>
+                        <div>
+                            <div class="step-title">Web Application & SPARQL Endpoint</div>
+                            <div class="step-file">📄 scripts/webapp_sparql.py → http://localhost:5000</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Features</h3>
+                        <ul>
+                            <li><strong>SPARQL Endpoint:</strong> Standard SPARQL 1.1 query interface</li>
+                            <li><strong>REST API:</strong> Programmatic access to knowledge graph</li>
+                            <li><strong>Interactive UI:</strong> Visual query builder and explorer</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">API Endpoints</h3>
+                        <table>
+                            <tr><th>Endpoint</th><th>Method</th><th>Purpose</th></tr>
+                            <tr><td>/sparql</td><td>GET/POST</td><td>Run SPARQL queries</td></tr>
+                            <tr><td>/api/stats</td><td>GET</td><td>Graph statistics</td></tr>
+                            <tr><td>/api/queries</td><td>GET</td><td>List predefined queries</td></tr>
+                            <tr><td>/api/query/{key}</td><td>GET</td><td>Run predefined query</td></tr>
+                            <tr><td>/api/search</td><td>GET</td><td>Search entities</td></tr>
+                            <tr><td>/api/graph/explore</td><td>GET</td><td>Graph visualization</td></tr>
+                        </table>
+                    </div>
+                    
+                    <div class="command-box">python webapp_sparql.py --port 5000</div>
+                </div>
+            </div>
+            
+            <!-- STEP 8: File Chain -->
+            <div class="step-content" data-step="8">
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">🔗</div>
+                        <div>
+                            <div class="step-title">Complete File Merge Chain</div>
+                            <div class="step-file">How all OWL files are connected</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">File Chain Visualization</h3>
+                        <div class="flow-diagram">
+                            <div class="flow-item"><div class="flow-box">pkg2020_core.owl<br><small>Step 1: Classes & Properties</small></div></div>
+                            <div class="flow-item"><span class="flow-arrow">↓</span> loaded by ontology_constraints.py</div>
+                            <div class="flow-item"><div class="flow-box">pkg2020_constrained.owl<br><small>Step 2: + Axioms & Defined Classes</small></div></div>
+                            <div class="flow-item"><span class="flow-arrow">↓</span> loaded by populate_authors_articles.py</div>
+                            <div class="flow-item"><div class="flow-box">pkg2020_populated_authors.owl<br><small>Step 3.1: + Authors & Articles</small></div></div>
+                            <div class="flow-item"><span class="flow-arrow">↓</span> loaded by populate_affiliations.py</div>
+                            <div class="flow-item"><div class="flow-box">pkg2020_step4_affiliations.owl<br><small>Step 3.2: + Affiliations</small></div></div>
+                            <div class="flow-item"><span class="flow-arrow">↓</span> ... more steps ...</div>
+                            <div class="flow-item"><div class="flow-box" style="background: rgba(0,212,255,0.2);">pkg2020_final.owl<br><small>✅ COMPLETE DATA</small></div></div>
+                            <div class="flow-item"><span class="flow-arrow">↓</span> loaded by reasoning.py & link_external_data.py</div>
+                            <div class="flow-item"><div class="flow-box" style="background: rgba(123,44,191,0.2);">pkg2020_linked.owl<br><small>🔗 + External Links</small></div></div>
+                        </div>
+                    </div>
+                    
+                    <div class="warning-box">
+                        <strong>Why This Architecture?</strong>
+                        <ol>
+                            <li><strong>Modularity:</strong> Each step is independent</li>
+                            <li><strong>Debugging:</strong> Easy to find which step has errors</li>
+                            <li><strong>Flexibility:</strong> Can re-run individual steps</li>
+                            <li><strong>Memory:</strong> Don't need all data at once</li>
+                            <li><strong>Version Control:</strong> Can track each stage</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- STEP 9: Summary -->
+            <div class="step-content" data-step="9">
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">✅</div>
+                        <div>
+                            <div class="step-title">Summary: Complete Execution</div>
+                            <div class="step-file">All commands to run the pipeline</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Complete Pipeline Commands</h3>
+                        <div class="code-block">
+<span class="comment"># Install requirements</span>
+pip install -r requirements.txt
+
+<span class="comment"># Navigate to scripts folder</span>
+cd scripts
+
+<span class="comment"># Step 1: Create core ontology</span>
+python ontology_core.py
+
+<span class="comment"># Step 2: Add constraints</span>
+python ontology_constraints.py
+
+<span class="comment"># Step 3: Populate data (IN ORDER!)</span>
+python populate_authors_articles.py
+python populate_affiliations.py
+python populate_employment.py
+python populate_education.py
+python populate_bioentities.py
+python populate_nih_projects.py
+
+<span class="comment"># Step 4: Run reasoning</span>
+python reasoning.py
+
+<span class="comment"># Step 5: Link external data</span>
+python link_external_data.py
+
+<span class="comment"># Step 6-7: Start web application</span>
+python webapp_sparql.py --port 5000
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3 class="section-title">Requirements Checklist for Instructor</h3>
+                        <table>
+                            <tr><th>Requirement</th><th>Status</th></tr>
+                            <tr><td>20+ ontology classes</td><td>✅</td></tr>
+                            <tr><td>Enumeration class (PublicationStatus)</td><td>✅</td></tr>
+                            <tr><td>Intersection class (ActiveAuthor)</td><td>✅</td></tr>
+                            <tr><td>Union class (ResearchEntity)</td><td>✅</td></tr>
+                            <tr><td>Complement class (AnonymousAuthor)</td><td>✅</td></tr>
+                            <tr><td>Functional properties</td><td>✅</td></tr>
+                            <tr><td>Inverse Functional properties</td><td>✅</td></tr>
+                            <tr><td>Cardinality restrictions</td><td>✅</td></tr>
+                            <tr><td>HermiT reasoning</td><td>✅</td></tr>
+                            <tr><td>External linking (DBpedia, Wikidata)</td><td>✅</td></tr>
+                            <tr><td>15 SPARQL competency queries</td><td>✅</td></tr>
+                            <tr><td>Web application with SPARQL endpoint</td><td>✅</td></tr>
+                        </table>
+                    </div>
+                    
+                    <div class="info-box" style="text-align: center; font-size: 1.2rem;">
+                        🎉 <strong>Pipeline Complete!</strong><br>
+                        You now have a fully functional Knowledge Graph with reasoning and querying capabilities.
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="nav-buttons">
+            <button class="nav-btn prev" id="prevBtn" onclick="prevStep()">← Previous</button>
+            <button class="nav-btn next" id="nextBtn" onclick="nextStep()">Next →</button>
+        </div>
+    </div>
+    
+    <script>
+        let currentStep = 0;
+        const totalSteps = 10; // 0-9
+        
+        function init() {
+            document.getElementById('totalSteps').textContent = totalSteps;
+            createStepNav();
+            showStep(0);
+        }
+        
+        function createStepNav() {
+            const nav = document.getElementById('stepNav');
+            const labels = ['📋', '1', '2', '3', '4', '5', '6', '7', '🔗', '✅'];
+            for (let i = 0; i < totalSteps; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'step-dot';
+                dot.textContent = labels[i];
+                dot.onclick = () => showStep(i);
+                nav.appendChild(dot);
+            }
+        }
+        
+        function showStep(step) {
+            currentStep = step;
+            
+            // Update progress
+            const progress = ((step + 1) / totalSteps) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('currentStep').textContent = step + 1;
+            
+            // Update step nav
+            document.querySelectorAll('.step-dot').forEach((dot, i) => {
+                dot.classList.remove('active', 'completed');
+                if (i === step) dot.classList.add('active');
+                else if (i < step) dot.classList.add('completed');
+            });
+            
+            // Show content
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelector(`[data-step="${step}"]`).classList.add('active');
+            
+            // Update nav buttons
+            document.getElementById('prevBtn').disabled = step === 0;
+            document.getElementById('nextBtn').disabled = step === totalSteps - 1;
+            document.getElementById('nextBtn').textContent = step === totalSteps - 1 ? '🎉 Complete!' : 'Next →';
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function nextStep() {
+            if (currentStep < totalSteps - 1) showStep(currentStep + 1);
+        }
+        
+        function prevStep() {
+            if (currentStep > 0) showStep(currentStep - 1);
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextStep();
+            if (e.key === 'ArrowLeft') prevStep();
+        });
+        
+        init();
+    </script>
+</body>
+</html>

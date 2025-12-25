@@ -92,16 +92,15 @@ print("="*60)
 federated_query = """
 # Federated query to get DBpedia information about organizations
 PREFIX pkg: <http://example.org/pkg2020/ontology.owl#>
-PREFIX dbpedia: <http://dbpedia.org/resource/>
 PREFIX dbo: <http://dbpedia.org/ontology/>
 
-SELECT ?org ?orgName ?dbpediaLink ?abstract
+SELECT ?org ?dbpediaLink ?abstract
 WHERE {
     ?org a pkg:Organization .
     ?org pkg:dbpediaLink ?dbpediaLink .
     
-    SERVICE <http://dbpedia.org/sparql> {
-        ?dbpediaLink dbo:abstract ?abstract .
+    SERVICE <https://dbpedia.org/sparql> {
+        OPTIONAL { ?dbpediaLink dbo:abstract ?abstract }
         FILTER (lang(?abstract) = 'en')
     }
 }
@@ -109,3 +108,4 @@ LIMIT 10
 """
 
 print(federated_query)
+
